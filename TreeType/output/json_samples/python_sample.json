@@ -66,7 +66,7 @@
         {
           "text": "->",
           "type": "->",
-          "typeable": true,
+          "typeable": false,
           "start_col": 32,
           "end_col": 34,
           "seq_in_line": 7
@@ -122,14 +122,6 @@
           "seq_in_line": 5
         },
         {
-          "text": "->",
-          "type": "->",
-          "typeable": true,
-          "start_col": 32,
-          "end_col": 34,
-          "seq_in_line": 7
-        },
-        {
           "text": "list",
           "type": "identifier",
           "typeable": true,
@@ -138,7 +130,7 @@
           "seq_in_line": 8
         }
       ],
-      "typing_sequence": "defcalculate_fibonaccinint->list",
+      "typing_sequence": "defcalculate_fibonaccinintlist",
       "char_map": {
         "0": {
           "token_idx": 0,
@@ -246,26 +238,18 @@
         },
         "26": {
           "token_idx": 4,
-          "display_col": 32
+          "display_col": 35
         },
         "27": {
           "token_idx": 4,
-          "display_col": 32
+          "display_col": 35
         },
         "28": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 35
         },
         "29": {
-          "token_idx": 5,
-          "display_col": 35
-        },
-        "30": {
-          "token_idx": 5,
-          "display_col": 35
-        },
-        "31": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 35
         }
       }

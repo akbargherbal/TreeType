@@ -334,7 +334,7 @@
         {
           "text": "=>",
           "type": "=>",
-          "typeable": true,
+          "typeable": false,
           "start_col": 30,
           "end_col": 32,
           "seq_in_line": 9
@@ -380,17 +380,9 @@
           "start_col": 22,
           "end_col": 24,
           "seq_in_line": 5
-        },
-        {
-          "text": "=>",
-          "type": "=>",
-          "typeable": true,
-          "start_col": 30,
-          "end_col": 32,
-          "seq_in_line": 9
         }
       ],
-      "typing_sequence": "constTodoListReactFC=>",
+      "typing_sequence": "constTodoListReactFC",
       "char_map": {
         "0": {
           "token_idx": 0,
@@ -471,14 +463,6 @@
         "19": {
           "token_idx": 3,
           "display_col": 22
-        },
-        "20": {
-          "token_idx": 4,
-          "display_col": 30
-        },
-        "21": {
-          "token_idx": 4,
-          "display_col": 30
         }
       }
     },
@@ -1106,7 +1090,7 @@
         {
           "text": "=>",
           "type": "=>",
-          "typeable": true,
+          "typeable": false,
           "start_col": 23,
           "end_col": 25,
           "seq_in_line": 5
@@ -1136,17 +1120,9 @@
           "start_col": 10,
           "end_col": 17,
           "seq_in_line": 1
-        },
-        {
-          "text": "=>",
-          "type": "=>",
-          "typeable": true,
-          "start_col": 23,
-          "end_col": 25,
-          "seq_in_line": 5
         }
       ],
-      "typing_sequence": "constaddTodo=>",
+      "typing_sequence": "constaddTodo",
       "char_map": {
         "0": {
           "token_idx": 0,
@@ -1195,14 +1171,6 @@
         "11": {
           "token_idx": 1,
           "display_col": 10
-        },
-        "12": {
-          "token_idx": 2,
-          "display_col": 23
-        },
-        "13": {
-          "token_idx": 2,
-          "display_col": 23
         }
       }
     },
@@ -2046,7 +2014,7 @@
         {
           "text": "=>",
           "type": "=>",
-          "typeable": true,
+          "typeable": false,
           "start_col": 30,
           "end_col": 32,
           "seq_in_line": 6
@@ -2142,14 +2110,6 @@
           "seq_in_line": 4
         },
         {
-          "text": "=>",
-          "type": "=>",
-          "typeable": true,
-          "start_col": 30,
-          "end_col": 32,
-          "seq_in_line": 6
-        },
-        {
           "text": "setInput",
           "type": "identifier",
           "typeable": true,
@@ -2182,7 +2142,7 @@
           "seq_in_line": 13
         }
       ],
-      "typing_sequence": "onChangee=>setInputetargetvalue",
+      "typing_sequence": "onChangeesetInputetargetvalue",
       "char_map": {
         "0": {
           "token_idx": 0,
@@ -2222,90 +2182,82 @@
         },
         "9": {
           "token_idx": 2,
-          "display_col": 30
+          "display_col": 33
         },
         "10": {
           "token_idx": 2,
-          "display_col": 30
+          "display_col": 33
         },
         "11": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "12": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "13": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "14": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "15": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "16": {
-          "token_idx": 3,
+          "token_idx": 2,
           "display_col": 33
         },
         "17": {
           "token_idx": 3,
-          "display_col": 33
+          "display_col": 42
         },
         "18": {
-          "token_idx": 3,
-          "display_col": 33
+          "token_idx": 4,
+          "display_col": 44
         },
         "19": {
           "token_idx": 4,
-          "display_col": 42
+          "display_col": 44
         },
         "20": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 44
         },
         "21": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 44
         },
         "22": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 44
         },
         "23": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 44
         },
         "24": {
           "token_idx": 5,
-          "display_col": 44
+          "display_col": 51
         },
         "25": {
           "token_idx": 5,
-          "display_col": 44
+          "display_col": 51
         },
         "26": {
-          "token_idx": 6,
+          "token_idx": 5,
           "display_col": 51
         },
         "27": {
-          "token_idx": 6,
+          "token_idx": 5,
           "display_col": 51
         },
         "28": {
-          "token_idx": 6,
-          "display_col": 51
-        },
-        "29": {
-          "token_idx": 6,
-          "display_col": 51
-        },
-        "30": {
-          "token_idx": 6,
+          "token_idx": 5,
           "display_col": 51
         }
       }
@@ -2318,33 +2270,15 @@
         {
           "text": "/>",
           "type": "/>",
-          "typeable": true,
+          "typeable": false,
           "start_col": 12,
           "end_col": 14,
           "seq_in_line": 0
         }
       ],
-      "typing_tokens": [
-        {
-          "text": "/>",
-          "type": "/>",
-          "typeable": true,
-          "start_col": 12,
-          "end_col": 14,
-          "seq_in_line": 0
-        }
-      ],
-      "typing_sequence": "/>",
-      "char_map": {
-        "0": {
-          "token_idx": 0,
-          "display_col": 12
-        },
-        "1": {
-          "token_idx": 0,
-          "display_col": 12
-        }
-      }
+      "typing_tokens": [],
+      "typing_sequence": "",
+      "char_map": {}
     },
     {
       "line_number": 19,
@@ -2426,7 +2360,7 @@
         {
           "text": "</",
           "type": "</",
-          "typeable": true,
+          "typeable": false,
           "start_col": 41,
           "end_col": 43,
           "seq_in_line": 9
@@ -2482,14 +2416,6 @@
           "seq_in_line": 8
         },
         {
-          "text": "</",
-          "type": "</",
-          "typeable": true,
-          "start_col": 41,
-          "end_col": 43,
-          "seq_in_line": 9
-        },
-        {
           "text": "button",
           "type": "identifier",
           "typeable": true,
@@ -2498,7 +2424,7 @@
           "seq_in_line": 10
         }
       ],
-      "typing_sequence": "buttononClickaddTodoAdd</button",
+      "typing_sequence": "buttononClickaddTodoAddbutton",
       "char_map": {
         "0": {
           "token_idx": 0,
@@ -2594,34 +2520,26 @@
         },
         "23": {
           "token_idx": 4,
-          "display_col": 41
+          "display_col": 43
         },
         "24": {
           "token_idx": 4,
-          "display_col": 41
+          "display_col": 43
         },
         "25": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 43
         },
         "26": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 43
         },
         "27": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 43
         },
         "28": {
-          "token_idx": 5,
-          "display_col": 43
-        },
-        "29": {
-          "token_idx": 5,
-          "display_col": 43
-        },
-        "30": {
-          "token_idx": 5,
+          "token_idx": 4,
           "display_col": 43
         }
       }
@@ -2634,7 +2552,7 @@
         {
           "text": "</",
           "type": "</",
-          "typeable": true,
+          "typeable": false,
           "start_col": 8,
           "end_col": 10,
           "seq_in_line": 0
@@ -2658,14 +2576,6 @@
       ],
       "typing_tokens": [
         {
-          "text": "</",
-          "type": "</",
-          "typeable": true,
-          "start_col": 8,
-          "end_col": 10,
-          "seq_in_line": 0
-        },
-        {
           "text": "div",
           "type": "identifier",
           "typeable": true,
@@ -2674,26 +2584,18 @@
           "seq_in_line": 1
         }
       ],
-      "typing_sequence": "</div",
+      "typing_sequence": "div",
       "char_map": {
         "0": {
           "token_idx": 0,
-          "display_col": 8
+          "display_col": 10
         },
         "1": {
           "token_idx": 0,
-          "display_col": 8
+          "display_col": 10
         },
         "2": {
-          "token_idx": 1,
-          "display_col": 10
-        },
-        "3": {
-          "token_idx": 1,
-          "display_col": 10
-        },
-        "4": {
-          "token_idx": 1,
+          "token_idx": 0,
           "display_col": 10
         }
       }
