@@ -23,8 +23,14 @@
 - Yellow highlight appears on `i` in `if`
 - Stats show: Line Progress "11/13" (not "2/13")
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
+**Result:**  ⚠️  
 **Notes:**
+- Cursor immediately jumps from line 0 to line 10 ✅ 
+- Line 10 has green left border (active indicator) ❌ las `t` in line number 1 is still in light blue!
+- Yellow highlight appears on `i` in `if`✅
+- Stats show: Line Progress "11/13" (not "2/13") actullay 4/13 ✅
+
+I am wondering where did those lines between 1 and 10 go? not that's a flaw; could be white space ignored by tree-sitter - but it's an interesting thing I did not notice until now.
 
 ---
 
@@ -35,12 +41,12 @@
 2. Visually inspect lines 1-9 (the skipped docstring lines)
 
 **Expected:**
-- NO yellow highlights on any character in lines 1-9
-- NO blinking underlines on lines 1-9
-- Docstring text appears dimmed/grayed out
-- Only ONE yellow highlight exists (on line 10)
+- NO yellow highlights on any character in lines 1-9 ✅
+- NO blinking underlines on lines 1-9 ✅
+- Docstring text appears dimmed/grayed out ⚠️ Actually shown in brown - which is not a bad thing; the most important thing is that user doesn't need to type comments/doc strings.
+- Only ONE yellow highlight exists (on line 10) ✅
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
+**Result:**  ✅ 
 **Notes:**
 
 ---
@@ -57,7 +63,7 @@
 - No visual artifacts from previous lines
 - Line 10 completes and advances to line 11
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
+**Result:**  ✅ 
 **Notes:**
 
 ---
@@ -73,8 +79,9 @@
 - Should NOT show "159/X" (docstring content length)
 - Total typeable chars for entire file should be ~40 (not ~200)
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
-**Char Progress shown:** ___________
+**Result:** ⚠️
+**Char Progress shown:**
+Please don't make this part of the manual tests; like calculating characters/stats; that's what computers made for not humans!
 
 ---
 
@@ -92,7 +99,7 @@
 - Can type through function declaration and const line
 - No errors in console
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
+**Result:**  ✅ 
 **Notes:**
 
 ---
@@ -108,13 +115,14 @@
 
 **Expected:**
 - Cursor skips from line 7 to line 13 (after template literal)
-- Lines 8-12 are NOT typeable
+- Lines 8-12 are NOT typeable 
 - Template literal content appears dimmed
 - No cursor on template literal lines
 
-**Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
+**Result:** ☐ ⚠️ 
 **Actual behavior:**
-
+I really didn't get that; like there were things I was expecting to type from line 9 to 12 inclusive.
+but some I didn't type - now that's not a bad thing in itself - I don't see it as a bug; but in the grand scheme of things we were sort of weighing that in the inception phase of the project - like how tree-sitters see multi-line template literals and that sort of things - So we should revisit that part and see if this is a must thing to have if the project to continue or it's just an option - like the whole thing started when we said we'd like to avoid problematic nodes; like multi-docs 
 ---
 
 ### Test B.3: No Multi-Cursor Bug in JavaScript
@@ -123,14 +131,14 @@
 1. As you type through JavaScript sample, watch last character of each completed line
 
 **Expected:**
-- Last character of completed line turns green (correct state)
-- NO yellow highlight remains on completed lines
-- NO blinking underline on completed lines
-- Only ONE yellow highlight exists at any time
+- Last character of completed line turns green (correct state) ❌
+- NO yellow highlight remains on completed lines ✅
+- NO blinking underline on completed lines ✅
+- Only ONE yellow highlight exists at any time ✅
 
 **Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
 **If failed, which lines show ghost cursors:** ___________
-
+⚠️
 ---
 
 ## Test Suite C: TypeScript JSDoc Comment Handling
@@ -138,14 +146,14 @@
 ### Test C.1: Switch to TypeScript Sample
 
 **Steps:**
-1. Select "TypeScript" from dropdown
+1. Select "TypeScript" from dropdown 
 2. Reset (Esc)
 3. Type through lines 0-5 (interface and blank line)
 
 **Expected:**
-- TypeScript sample loads
-- Can type through interface definition
-- No issues with type annotations (`:`, `number`, `string`)
+- TypeScript sample loads ✅
+- Can type through interface definition ✅
+- No issues with type annotations (`:`, `number`, `string`) ✅
 
 **Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
 **Notes:**
@@ -168,9 +176,12 @@
 
 **Result:** ☐ ✅ / ☐ ❌ / ☐ ⚠️  
 **Actual behavior:**
-
+✅
 ---
 
+
+STOPPING HERE; KIND OF LOTS OF TEST; IT'LL BE BENEFITIAL IF WE HAVE THOSE TESTS AUTOMATED; SUCH THAT WE DO MANUAL TESTING ONLY TO THOSE TEST THAT RQUIRE HUMAN MANUL TESTING.
+---
 ### Test C.3: Comment Content Not in Typing Sequence
 
 **Steps:**

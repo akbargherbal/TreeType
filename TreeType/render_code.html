@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tree-Sitter Typing Game - Phase 2.2</title>
+    <title>Tree-Sitter Typing Game - Phase 2 Complete</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
@@ -147,6 +147,117 @@
       .test-active {
         border-left: 4px solid #10b981;
       }
+
+      /* Completion Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fadeIn 0.3s;
+      }
+
+      .modal-content {
+        background: #2a2a2a;
+        border-radius: 12px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        animation: slideUp 0.3s;
+        border: 2px solid #4ade80;
+      }
+
+      .modal-title {
+        font-size: 2em;
+        margin-bottom: 8px;
+      }
+
+      .modal-subtitle {
+        color: #9ca3af;
+        margin-bottom: 24px;
+      }
+
+      .modal-stats {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+      }
+
+      .modal-stat {
+        margin: 12px 0;
+      }
+
+      .modal-stat-label {
+        color: #9ca3af;
+        font-size: 0.9em;
+      }
+
+      .modal-stat-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #4ade80;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .modal-button {
+        padding: 12px 24px;
+        border-radius: 6px;
+        border: none;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .modal-button-primary {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .modal-button-primary:hover {
+        background: #2563eb;
+      }
+
+      .modal-button-secondary {
+        background: #374151;
+        color: white;
+      }
+
+      .modal-button-secondary:hover {
+        background: #4b5563;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body class="p-8">
@@ -155,7 +266,7 @@
       <div class="mb-8">
         <h1 class="text-3xl font-bold mb-2">Tree-Sitter Typing Game</h1>
         <p class="text-gray-400">
-          Phase 2.2: Typing Input Handler with Visual Feedback
+          Phase 2 Complete: Multi-line Token Handling with Completion Modal
         </p>
       </div>
 
@@ -244,6 +355,7 @@
         currentCharIndex: 0,
         totalCharsTyped: 0,
         totalErrors: 0,
+        completedLines: new Set(), // Track which lines are fully typed
       };
 
       // =====================================================================
@@ -285,6 +397,7 @@
           currentCharIndex: 0,
           totalCharsTyped: 0,
           totalErrors: 0,
+          completedLines: new Set(),
         };
 
         renderCode();
@@ -342,6 +455,7 @@
         let typedCharCount = 0;
 
         const isCurrentLine = lineIndex === testState.currentLineIndex;
+        const isCompletedLine = testState.completedLines.has(lineIndex);
 
         lineData.display_tokens.forEach((token, tokenIndex) => {
           // Add spaces to reach token's start column
@@ -350,8 +464,8 @@
             container.appendChild(document.createTextNode(spaces));
           }
 
-          // For typeable tokens on current line, render character-by-character
-          if (isCurrentLine && token.typeable) {
+          // For typeable tokens, render character-by-character if current or completed line
+          if (token.typeable && (isCurrentLine || isCompletedLine)) {
             for (let i = 0; i < token.text.length; i++) {
               const charSpan = document.createElement("span");
               charSpan.textContent = token.text[i];
@@ -361,21 +475,26 @@
               charSpan.className = cssClass;
 
               // Apply typing feedback
-              if (typedCharCount < testState.currentCharIndex) {
-                // Already typed
+              if (isCompletedLine) {
+                // All characters on completed lines are green
                 charSpan.classList.add("char-correct");
-              } else if (typedCharCount === testState.currentCharIndex) {
-                // Current character
-                charSpan.classList.add("char-current");
-                charSpan.id = "current-char";
+              } else if (isCurrentLine) {
+                if (typedCharCount < testState.currentCharIndex) {
+                  // Already typed
+                  charSpan.classList.add("char-correct");
+                } else if (typedCharCount === testState.currentCharIndex) {
+                  // Current character
+                  charSpan.classList.add("char-current");
+                  charSpan.id = "current-char";
+                }
+                // else: not yet typed (keep default styling)
               }
-              // else: not yet typed (keep default styling)
 
               container.appendChild(charSpan);
               typedCharCount++;
             }
           } else {
-            // Non-typeable or not current line - render as single span
+            // Non-typeable or not current/completed line - render as single span
             const tokenSpan = document.createElement("span");
             tokenSpan.textContent = token.text;
 
@@ -518,13 +637,17 @@
           testState.currentCharIndex++;
           testState.totalCharsTyped++;
 
-          // Check if line is complete
+          // ALWAYS update display first to show the character as green
+          updateDisplay();
+
+          // THEN check if line is complete (after a small delay to let render complete)
           if (
             testState.currentCharIndex >= currentLine.typing_sequence.length
           ) {
-            moveToNextLine();
-          } else {
-            updateDisplay();
+            // Use setTimeout to ensure the green character renders before line switch
+            setTimeout(() => {
+              moveToNextLine();
+            }, 50);
           }
         } else {
           // Wrong key - flash error
@@ -533,12 +656,14 @@
           updateStats();
         }
       }
-
       // =====================================================================
       // MOVE TO NEXT LINE
       // =====================================================================
 
       function moveToNextLine() {
+        // Mark current line as completed
+        testState.completedLines.add(testState.currentLineIndex);
+
         // Clean up old cursor before moving
         const oldCursor = document.getElementById("current-char");
         if (oldCursor) {
@@ -639,6 +764,10 @@
         testState.endTime = Date.now();
 
         const elapsed = (testState.endTime - testState.startTime) / 1000;
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = Math.floor(elapsed % 60);
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
         const wpm = Math.round(testState.totalCharsTyped / 5 / (elapsed / 60));
         const accuracy = Math.round(
           ((testState.totalCharsTyped - testState.totalErrors) /
@@ -646,12 +775,78 @@
             100
         );
 
-        updateStatus(
-          `Complete! ${wpm} WPM, ${accuracy}% accuracy. Press Esc to try again.`,
-          "success"
-        );
+        // Show completion modal
+        showCompletionModal(wpm, accuracy, timeStr);
 
         updateStats();
+      }
+
+      // =====================================================================
+      // SHOW COMPLETION MODAL
+      // =====================================================================
+
+      function showCompletionModal(wpm, accuracy, timeStr) {
+        // Create modal overlay
+        const overlay = document.createElement("div");
+        overlay.className = "modal-overlay";
+        overlay.id = "completionModal";
+
+        // Create modal content
+        overlay.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-title">🎉 Test Complete!</div>
+            <div class="modal-subtitle">Great job on completing the test</div>
+            
+            <div class="modal-stats">
+              <div class="modal-stat">
+                <div class="modal-stat-label">Words Per Minute</div>
+                <div class="modal-stat-value">${wpm}</div>
+              </div>
+              <div class="modal-stat">
+                <div class="modal-stat-label">Accuracy</div>
+                <div class="modal-stat-value">${accuracy}%</div>
+              </div>
+              <div class="modal-stat">
+                <div class="modal-stat-label">Time</div>
+                <div class="modal-stat-value">${timeStr}</div>
+              </div>
+            </div>
+
+            <div class="modal-buttons">
+              <button class="modal-button modal-button-primary" onclick="retryTest()">
+                Retry Test
+              </button>
+              <button class="modal-button modal-button-secondary" onclick="closeModal()">
+                Change Language
+              </button>
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Close on clicking overlay
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) {
+            closeModal();
+          }
+        });
+      }
+
+      // =====================================================================
+      // MODAL ACTIONS
+      // =====================================================================
+
+      function closeModal() {
+        const modal = document.getElementById("completionModal");
+        if (modal) {
+          modal.remove();
+        }
+      }
+
+      function retryTest() {
+        closeModal();
+        resetTest();
       }
 
       // =====================================================================
