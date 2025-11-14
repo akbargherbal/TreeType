@@ -300,16 +300,38 @@
           <!-- NEW: Typing Mode Selector -->
           <label class="text-gray-300 ml-6">Typing Mode:</label>
           <div class="flex gap-2">
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition">
-              <input type="radio" name="typingMode" value="minimal" class="cursor-pointer">
+            <label
+              class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition"
+            >
+              <input
+                type="radio"
+                name="typingMode"
+                value="minimal"
+                class="cursor-pointer"
+              />
               <span class="text-sm">Minimal</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition">
-              <input type="radio" name="typingMode" value="standard" checked class="cursor-pointer">
+            <label
+              class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition"
+            >
+              <input
+                type="radio"
+                name="typingMode"
+                value="standard"
+                checked
+                class="cursor-pointer"
+              />
               <span class="text-sm">Standard</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition">
-              <input type="radio" name="typingMode" value="full" class="cursor-pointer">
+            <label
+              class="flex items-center gap-2 cursor-pointer px-3 py-2 bg-gray-800 rounded hover:bg-gray-700 transition"
+            >
+              <input
+                type="radio"
+                name="typingMode"
+                value="full"
+                class="cursor-pointer"
+              />
               <span class="text-sm">Full</span>
             </label>
           </div>
@@ -369,17 +391,20 @@
             reset
           </li>
         </ul>
-        
+
         <h3 class="font-bold mb-2 mt-4">Typing Modes:</h3>
         <ul class="text-sm space-y-1">
           <li>
-            • <strong>Minimal</strong>: Type only keywords and identifiers (fastest)
+            • <strong>Minimal</strong>: Type only keywords and identifiers
+            (fastest)
           </li>
           <li>
-            • <strong>Standard</strong> ⭐: Type keywords, identifiers, operators, and <code>:</code> <code>;</code> (recommended)
+            • <strong>Standard</strong> ⭐: Type keywords, identifiers,
+            operators, and <code>:</code> <code>;</code> (recommended)
           </li>
           <li>
-            • <strong>Full</strong>: Type everything except whitespace and comments (maximum practice)
+            • <strong>Full</strong>: Type everything except whitespace and
+            comments (maximum practice)
           </li>
         </ul>
       </div>
@@ -392,22 +417,29 @@
 
       const PRESETS = {
         minimal: {
-          name: 'Minimal',
-          description: 'Type only keywords and identifiers',
-          exclude: ['bracket', 'operator', 'punctuation', 'string_content', 'string_delimiter', 'comment']
+          name: "Minimal",
+          description: "Type only keywords and identifiers",
+          exclude: [
+            "bracket",
+            "operator",
+            "punctuation",
+            "string_content",
+            "string_delimiter",
+            "comment",
+          ],
         },
         standard: {
-          name: 'Standard',
-          description: 'Balanced typing experience (recommended)',
-          exclude: ['bracket', 'string_content', 'string_delimiter', 'comment'],
+          name: "Standard",
+          description: "Balanced typing experience (recommended)",
+          exclude: ["bracket", "string_content", "string_delimiter", "comment"],
           // Special handling: include : and ; even though they're in punctuation category
-          includeSpecific: [':', ';']
+          includeSpecific: [":", ";"],
         },
         full: {
-          name: 'Full',
-          description: 'Type everything except whitespace and comments',
-          exclude: ['comment', 'string_content']
-        }
+          name: "Full",
+          description: "Type everything except whitespace and comments",
+          exclude: ["comment", "string_content"],
+        },
       };
 
       // =====================================================================
@@ -434,21 +466,24 @@
 
       function applyExclusionConfig(lineData, preset) {
         const config = PRESETS[preset];
-        
+
         // Filter tokens based on preset
-        const filteredTokens = lineData.display_tokens.map(token => {
+        const filteredTokens = lineData.display_tokens.map((token) => {
           let typeable = token.base_typeable;
-          
+
           // If token has no categories, it's always typeable (keywords, identifiers)
           if (!token.categories || token.categories.length === 0) {
             return { ...token, typeable };
           }
-          
+
           // Check if token should be specifically included (Standard mode: : and ;)
-          if (config.includeSpecific && config.includeSpecific.includes(token.text)) {
+          if (
+            config.includeSpecific &&
+            config.includeSpecific.includes(token.text)
+          ) {
             return { ...token, typeable: true };
           }
-          
+
           // Check if any of the token's categories are in the exclusion list
           for (const category of token.categories) {
             if (config.exclude.includes(category)) {
@@ -456,36 +491,36 @@
               break;
             }
           }
-          
+
           return { ...token, typeable };
         });
-        
+
         // Regenerate typing_sequence from typeable tokens
         const typingSequence = filteredTokens
-          .filter(t => t.typeable)
-          .map(t => t.text)
-          .join('');
-        
+          .filter((t) => t.typeable)
+          .map((t) => t.text)
+          .join("");
+
         // Regenerate char_map
         const charMap = {};
         let charIdx = 0;
-        const typeableTokens = filteredTokens.filter(t => t.typeable);
-        
+        const typeableTokens = filteredTokens.filter((t) => t.typeable);
+
         typeableTokens.forEach((token, tokenIdx) => {
           for (let i = 0; i < token.text.length; i++) {
             charMap[String(charIdx)] = {
               token_idx: tokenIdx,
-              display_col: token.start_col
+              display_col: token.start_col,
             };
             charIdx++;
           }
         });
-        
+
         return {
           ...lineData,
           display_tokens: filteredTokens,
           typing_sequence: typingSequence,
-          char_map: charMap
+          char_map: charMap,
         };
       }
 
@@ -502,16 +537,20 @@
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           rawData = await response.json();
-          
+
           // Get current preset
-          const preset = document.querySelector('input[name="typingMode"]:checked').value;
-          
+          const preset = document.querySelector(
+            'input[name="typingMode"]:checked'
+          ).value;
+
           // Apply filtering to all lines
           currentData = {
             ...rawData,
-            lines: rawData.lines.map(line => applyExclusionConfig(line, preset))
+            lines: rawData.lines.map((line) =>
+              applyExclusionConfig(line, preset)
+            ),
           };
-          
+
           resetTest();
         } catch (error) {
           console.error("Error loading file:", error);
@@ -548,16 +587,19 @@
         updateStats();
         updateStatus("Press any key to start...");
 
+        // CRITICAL: Use requestAnimationFrame to ensure DOM is fully rendered
+        // before calculating scroll position. This prevents the "6 lines of padding" bug
+        // when switching languages.
         requestAnimationFrame(() => {
           const firstLine = document.getElementById("line-0");
           if (firstLine) {
             const targetY =
               firstLine.offsetTop -
-              window.innerHeight / 2 +
-              firstLine.offsetHeight / 2;
+              window.innerHeight / 4 +
+              firstLine.offsetHeight / 4;
             window.scrollTo({
               top: targetY,
-              behavior: "auto",
+              behavior: "auto", // Instant scroll on reset, not smooth
             });
           }
         });
@@ -647,8 +689,9 @@
             } else if (isCurrentLine) {
               const tokenStartsAfterCursor =
                 token.start_col >
-                (lineData.display_tokens.filter(t => t.typeable)[testState.currentCharIndex]
-                  ?.start_col || 0);
+                (lineData.display_tokens.filter((t) => t.typeable)[
+                  testState.currentCharIndex
+                ]?.start_col || 0);
               if (tokenStartsAfterCursor) {
                 tokenSpan.classList.add("char-untyped");
               }
@@ -684,11 +727,13 @@
               100
           );
         }
-        
+
         // Get current preset name
-        const preset = document.querySelector('input[name="typingMode"]:checked').value;
+        const preset = document.querySelector(
+          'input[name="typingMode"]:checked'
+        ).value;
         const presetName = PRESETS[preset].name;
-        
+
         document.getElementById("stats").innerHTML = `
                 <div class="grid grid-cols-6 gap-4 text-sm">
                     <div><div class="text-gray-400">Language</div><div class="font-bold">${
@@ -814,8 +859,8 @@
 
         const targetY =
           nextLineEl.offsetTop -
-          viewportHeight / 2 +
-          nextLineEl.offsetHeight / 2;
+          viewportHeight / 4 +
+          nextLineEl.offsetHeight / 4;
 
         if (targetY > currentScrollY) {
           window.scrollTo({
@@ -960,20 +1005,21 @@
       // =====================================================================
 
       const DEFAULT_CONFIG = {
-        preset: 'standard',
-        language: 'python'
+        preset: "standard",
+        language: "python",
       };
 
       function saveConfig() {
         const config = {
-          preset: document.querySelector('input[name="typingMode"]:checked').value,
-          language: document.getElementById('languageSelect').value
+          preset: document.querySelector('input[name="typingMode"]:checked')
+            .value,
+          language: document.getElementById("languageSelect").value,
         };
-        localStorage.setItem('treetype_config', JSON.stringify(config));
+        localStorage.setItem("treetype_config", JSON.stringify(config));
       }
 
       function loadConfig() {
-        const saved = localStorage.getItem('treetype_config');
+        const saved = localStorage.getItem("treetype_config");
         return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
       }
 
@@ -987,25 +1033,29 @@
           loadLanguage(e.target.value);
           saveConfig();
         });
-        
+
       // NEW: Add event listener for preset changes
-      document.querySelectorAll('input[name="typingMode"]').forEach(radio => {
-        radio.addEventListener('change', () => {
+      document.querySelectorAll('input[name="typingMode"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
           if (rawData) {
-            const preset = document.querySelector('input[name="typingMode"]:checked').value;
-            
+            const preset = document.querySelector(
+              'input[name="typingMode"]:checked'
+            ).value;
+
             // Reapply filtering to all lines
             currentData = {
               ...rawData,
-              lines: rawData.lines.map(line => applyExclusionConfig(line, preset))
+              lines: rawData.lines.map((line) =>
+                applyExclusionConfig(line, preset)
+              ),
             };
-            
+
             resetTest();
             saveConfig();
           }
         });
       });
-      
+
       document.getElementById("resetBtn").addEventListener("click", () => {
         resetTest();
       });
@@ -1016,23 +1066,25 @@
         document.getElementById("codeDisplay").classList.remove("focused");
       });
       document.addEventListener("keydown", handleKeyPress);
-      
+
       // NEW: Load saved config on page load
       document.addEventListener("DOMContentLoaded", () => {
         const config = loadConfig();
-        
+
         // Set preset
-        const presetRadio = document.querySelector(`input[name="typingMode"][value="${config.preset}"]`);
+        const presetRadio = document.querySelector(
+          `input[name="typingMode"][value="${config.preset}"]`
+        );
         if (presetRadio) {
           presetRadio.checked = true;
         }
-        
+
         // Set language
-        document.getElementById('languageSelect').value = config.language;
-        
+        document.getElementById("languageSelect").value = config.language;
+
         // Load language with saved config
         loadLanguage(config.language);
-        document.getElementById('codeDisplay').focus();
+        document.getElementById("codeDisplay").focus();
       });
     </script>
   </body>
