@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tree-Sitter Typing Game - Phase 2 Complete</title>
+    <title>Tree-Sitter Typing Game - Phase 3.5 Enhanced UX</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
@@ -15,9 +15,11 @@
       .line {
         line-height: 1.6;
         padding: 2px 0;
+        transition: background 0.2s;
       }
 
-      .line:hover {
+      /* Only show hover when test is NOT active */
+      body:not(.test-active) .line:hover {
         background: #2a2a2a;
       }
 
@@ -90,14 +92,10 @@
         color: #c586c0;
       }
 
-      .non-typeable {
-        opacity: 0.6;
-      }
-
-      /* PHASE 2: Typing feedback styles */
-      .char-correct {
-        color: #4ade80 !important;
-        opacity: 1 !important;
+      /* PHASE 3.5: Progressive reveal styles */
+      .char-untyped {
+        color: #858585 !important;
+        opacity: 1;
       }
 
       .char-current {
@@ -108,7 +106,9 @@
 
       .char-error {
         color: #ef4444 !important;
-        animation: shake 0.3s;
+        background: rgba(239, 68, 68, 0.4);
+        border: 2px solid #ef4444;
+        border-radius: 2px;
       }
 
       @keyframes pulse {
@@ -121,31 +121,39 @@
         }
       }
 
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-2px);
-        }
-        75% {
-          transform: translateX(2px);
-        }
+      /* Active test indicator */
+      .test-active-line {
+        border-left: 4px solid #10b981;
       }
 
-      /* Focus indicator for code area */
+      /* Distraction-free mode: fade controls during active typing */
+      .controls-area {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      body.test-active .controls-area {
+        opacity: 0.1;
+        pointer-events: none;
+      }
+
+      body.test-active .controls-area:hover {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Center the typing area for better ergonomics */
       #codeDisplay {
         outline: none;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 20vh;
+        padding-bottom: 40vh;
       }
 
       #codeDisplay.focused {
         box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-      }
-
-      /* Active test indicator */
-      .test-active {
-        border-left: 4px solid #10b981;
       }
 
       /* Completion Modal */
@@ -262,41 +270,44 @@
   </head>
   <body class="p-8">
     <div class="max-w-6xl mx-auto">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold mb-2">Tree-Sitter Typing Game</h1>
-        <p class="text-gray-400">
-          Phase 2 Complete: Multi-line Token Handling with Completion Modal
-        </p>
-      </div>
-
-      <!-- Controls -->
-      <div class="mb-6 flex gap-4 items-center">
-        <label class="text-gray-300">Language:</label>
-        <select
-          id="languageSelect"
-          class="bg-gray-800 text-white px-4 py-2 rounded border border-gray-600"
-        >
-          <option value="python">Python</option>
-          <option value="javascript">JavaScript</option>
-          <option value="typescript">TypeScript</option>
-          <option value="tsx">TSX/React</option>
-        </select>
-
-        <button
-          id="resetBtn"
-          class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-        >
-          Reset (Esc)
-        </button>
-
-        <div id="testStatus" class="ml-auto text-sm">
-          <span class="text-gray-400">Press any key to start...</span>
+      <!-- Header & Controls: Wrapped for fade effect -->
+      <div class="controls-area">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold mb-2">Tree-Sitter Typing Game</h1>
+          <p class="text-gray-400">
+            Phase 3.5: Enhanced UX - Distraction-Free Typing
+          </p>
         </div>
-      </div>
 
-      <!-- Stats Display -->
-      <div id="stats" class="mb-6 p-4 bg-gray-800 rounded"></div>
+        <!-- Controls -->
+        <div class="mb-6 flex gap-4 items-center">
+          <label class="text-gray-300">Language:</label>
+          <select
+            id="languageSelect"
+            class="bg-gray-800 text-white px-4 py-2 rounded border border-gray-600"
+          >
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="tsx">TSX/React</option>
+          </select>
+
+          <button
+            id="resetBtn"
+            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
+          >
+            Reset (Esc)
+          </button>
+
+          <div id="testStatus" class="ml-auto text-sm">
+            <span class="text-gray-400">Press any key to start...</span>
+          </div>
+        </div>
+
+        <!-- Stats Display -->
+        <div id="stats" class="mb-6 p-4 bg-gray-800 rounded"></div>
+      </div>
 
       <!-- Code Display -->
       <div
@@ -307,13 +318,12 @@
         <div id="codeLines"></div>
       </div>
 
-      <!-- Instructions -->
-      <div class="mt-6 p-4 bg-gray-800 rounded">
+      <!-- Instructions: Also fade during typing -->
+      <div class="mt-6 p-4 bg-gray-800 rounded controls-area">
         <h3 class="font-bold mb-2">Instructions:</h3>
         <ul class="text-sm space-y-1">
           <li>
-            • <span class="text-green-400">Green text</span> = Already typed
-            correctly
+            • <span class="text-gray-400">Gray text</span> = Not yet typed
           </li>
           <li>
             •
@@ -323,19 +333,22 @@
             = Current character to type
           </li>
           <li>
-            • <span class="text-gray-400">Dimmed text</span> = Non-typeable
-            (will be skipped automatically)
+            • <span style="color: #569cd6">Colored text</span> = Already typed
+            (syntax revealed)
           </li>
           <li>
-            • <span class="text-red-400">Red flash</span> = Wrong key pressed
+            • <span class="text-red-400 bg-red-900 bg-opacity-20 px-1">Red highlight</span> = Wrong key (stays until corrected)
           </li>
           <li>
             • Type only the <strong>highlighted characters</strong> -
-            punctuation and brackets are skipped
+            punctuation and brackets are revealed automatically
           </li>
           <li>
             • Press <kbd class="px-2 py-1 bg-gray-700 rounded">Esc</kbd> to
             reset
+          </li>
+          <li>
+            • <strong>Distraction-free mode:</strong> Controls fade when typing (hover to show)
           </li>
         </ul>
       </div>
@@ -355,7 +368,8 @@
         currentCharIndex: 0,
         totalCharsTyped: 0,
         totalErrors: 0,
-        completedLines: new Set(), // Track which lines are fully typed
+        completedLines: new Set(),
+        errorOnCurrentChar: false,
       };
 
       // =====================================================================
@@ -398,11 +412,21 @@
           totalCharsTyped: 0,
           totalErrors: 0,
           completedLines: new Set(),
+          errorOnCurrentChar: false,
         };
+
+        // Disable distraction-free mode
+        document.body.classList.remove("test-active");
 
         renderCode();
         updateStats();
         updateStatus("Press any key to start...");
+        
+        // Scroll to top smoothly
+        document.getElementById("codeDisplay").scrollIntoView({ 
+          behavior: "smooth", 
+          block: "start" 
+        });
       }
 
       // =====================================================================
@@ -423,7 +447,7 @@
 
           // Highlight current line
           if (lineIndex === testState.currentLineIndex) {
-            lineDiv.classList.add("test-active");
+            lineDiv.classList.add("test-active-line");
           }
 
           // Line number
@@ -447,7 +471,7 @@
       }
 
       // =====================================================================
-      // RENDER LINE TOKENS
+      // RENDER LINE TOKENS (PHASE 3.5: PROGRESSIVE REVEAL)
       // =====================================================================
 
       function renderLineTokens(container, lineData, lineIndex) {
@@ -456,6 +480,7 @@
 
         const isCurrentLine = lineIndex === testState.currentLineIndex;
         const isCompletedLine = testState.completedLines.has(lineIndex);
+        const isFutureLine = lineIndex > testState.currentLineIndex;
 
         lineData.display_tokens.forEach((token, tokenIndex) => {
           // Add spaces to reach token's start column
@@ -464,45 +489,66 @@
             container.appendChild(document.createTextNode(spaces));
           }
 
-          // For typeable tokens, render character-by-character if current or completed line
-          if (token.typeable && (isCurrentLine || isCompletedLine)) {
+          // Get base CSS class for syntax highlighting
+          const baseCssClass = getCssClass(token.type, token.text);
+
+          // For typeable tokens, render character-by-character
+          if (token.typeable) {
             for (let i = 0; i < token.text.length; i++) {
               const charSpan = document.createElement("span");
               charSpan.textContent = token.text[i];
+              charSpan.className = baseCssClass;
 
-              // Apply base styling
-              const cssClass = getCssClass(token.type, token.text);
-              charSpan.className = cssClass;
-
-              // Apply typing feedback
               if (isCompletedLine) {
-                // All characters on completed lines are green
-                charSpan.classList.add("char-correct");
+                // Completed line: all chars show syntax colors (revealed)
+                // Base class already applied, no additional changes needed
+              } else if (isFutureLine) {
+                // Future lines: all gray
+                charSpan.classList.add("char-untyped");
               } else if (isCurrentLine) {
                 if (typedCharCount < testState.currentCharIndex) {
-                  // Already typed
-                  charSpan.classList.add("char-correct");
+                  // Already typed: show syntax color (revealed)
+                  // Base class already applied
                 } else if (typedCharCount === testState.currentCharIndex) {
                   // Current character
-                  charSpan.classList.add("char-current");
+                  if (testState.errorOnCurrentChar) {
+                    charSpan.classList.add("char-error");
+                  } else {
+                    charSpan.classList.add("char-current");
+                  }
+                  charSpan.classList.add("char-untyped"); // Still gray until typed
                   charSpan.id = "current-char";
+                } else {
+                  // Not yet typed: gray
+                  charSpan.classList.add("char-untyped");
                 }
-                // else: not yet typed (keep default styling)
               }
 
               container.appendChild(charSpan);
               typedCharCount++;
             }
           } else {
-            // Non-typeable or not current/completed line - render as single span
+            // Non-typeable tokens
             const tokenSpan = document.createElement("span");
             tokenSpan.textContent = token.text;
+            tokenSpan.className = baseCssClass;
 
-            const cssClass = getCssClass(token.type, token.text);
-            tokenSpan.className = cssClass;
-
-            if (!token.typeable) {
-              tokenSpan.className += " non-typeable";
+            // Progressive reveal logic for non-typeable tokens
+            if (isCompletedLine) {
+              // Completed line: show syntax color
+              // Base class already applied
+            } else if (isFutureLine) {
+              // Future lines: all gray
+              tokenSpan.classList.add("char-untyped");
+            } else if (isCurrentLine) {
+              // Current line: reveal when cursor passes
+              const tokenStartsAfterCursor = token.start_col > 
+                (lineData.typing_tokens[testState.currentCharIndex]?.start_col || 0);
+              
+              if (tokenStartsAfterCursor) {
+                tokenSpan.classList.add("char-untyped");
+              }
+              // else: cursor has passed, show syntax color
             }
 
             container.appendChild(tokenSpan);
@@ -528,7 +574,7 @@
         let accuracy = 100;
 
         if (testState.active && testState.startTime) {
-          const elapsed = (Date.now() - testState.startTime) / 1000 / 60; // minutes
+          const elapsed = (Date.now() - testState.startTime) / 1000 / 60;
           if (elapsed > 0) {
             wpm = Math.round(testState.totalCharsTyped / 5 / elapsed);
           }
@@ -588,7 +634,7 @@
       }
 
       // =====================================================================
-      // KEYBOARD INPUT HANDLER
+      // KEYBOARD INPUT HANDLER (PHASE 3.5: PERSISTENT ERROR STATE)
       // =====================================================================
 
       function handleKeyPress(event) {
@@ -622,6 +668,9 @@
           testState.active = true;
           testState.startTime = Date.now();
           updateStatus("Typing...", "success");
+          
+          // Enable distraction-free mode
+          document.body.classList.add("test-active");
         }
 
         const currentLine = currentData.lines[testState.currentLineIndex];
@@ -636,26 +685,28 @@
           // Correct key!
           testState.currentCharIndex++;
           testState.totalCharsTyped++;
+          testState.errorOnCurrentChar = false; // Clear error state
 
-          // ALWAYS update display first to show the character as green
+          // ALWAYS update display first to show the character with syntax color
           updateDisplay();
 
           // THEN check if line is complete (after a small delay to let render complete)
           if (
             testState.currentCharIndex >= currentLine.typing_sequence.length
           ) {
-            // Use setTimeout to ensure the green character renders before line switch
             setTimeout(() => {
               moveToNextLine();
             }, 50);
           }
         } else {
-          // Wrong key - flash error
+          // Wrong key - set persistent error state
           testState.totalErrors++;
-          flashError();
+          testState.errorOnCurrentChar = true;
+          updateDisplay(); // Re-render to show red highlight
           updateStats();
         }
       }
+
       // =====================================================================
       // MOVE TO NEXT LINE
       // =====================================================================
@@ -664,17 +715,12 @@
         // Mark current line as completed
         testState.completedLines.add(testState.currentLineIndex);
 
-        // Clean up old cursor before moving
-        const oldCursor = document.getElementById("current-char");
-        if (oldCursor) {
-          oldCursor.removeAttribute("id");
-          oldCursor.classList.remove("char-current");
-        }
-
+        // Move to next line
         testState.currentLineIndex++;
         testState.currentCharIndex = 0;
+        testState.errorOnCurrentChar = false; // Reset error state for new line
 
-        // Skip lines with empty typing sequences (comments, docstrings, etc.)
+        // Skip lines with empty typing sequences
         while (testState.currentLineIndex < currentData.total_lines) {
           const nextLine = currentData.lines[testState.currentLineIndex];
 
@@ -683,11 +729,12 @@
             nextLine.typing_sequence &&
             nextLine.typing_sequence.length > 0
           ) {
-            // Found a line with typeable content
+            // Found a valid line to type
             break;
           }
 
-          // This line is empty/non-typeable, skip to next
+          // This line is empty/non-typeable, mark as completed and skip
+          testState.completedLines.add(testState.currentLineIndex);
           testState.currentLineIndex++;
         }
 
@@ -695,24 +742,18 @@
         if (testState.currentLineIndex >= currentData.total_lines) {
           completeTest();
         } else {
-          updateDisplay();
+          // Re-render the entire display to update all line states
+          renderCode();
+          updateStats();
         }
       }
 
       // =====================================================================
-      // UPDATE DISPLAY (after correct key)
+      // UPDATE DISPLAY
       // =====================================================================
 
       function updateDisplay() {
-        // AGGRESSIVE CLEANUP: Remove all cursor indicators
-        document.querySelectorAll(".char-current").forEach((el) => {
-          el.classList.remove("char-current");
-          if (el.id === "current-char") {
-            el.removeAttribute("id");
-          }
-        });
-
-        // Re-render current line
+        // Re-render the current line to update character states
         const currentLine = currentData.lines[testState.currentLineIndex];
         const contentDiv = document.getElementById(
           `line-content-${testState.currentLineIndex}`
@@ -726,32 +767,22 @@
         // Update active line indicator
         document.querySelectorAll(".line").forEach((line, idx) => {
           if (idx === testState.currentLineIndex) {
-            line.classList.add("test-active");
+            line.classList.add("test-active-line");
           } else {
-            line.classList.remove("test-active");
+            line.classList.remove("test-active-line");
           }
         });
 
         updateStats();
 
-        // Scroll current character into view
+        // Scroll current character into view, keeping it at comfortable eye level
         const currentChar = document.getElementById("current-char");
         if (currentChar) {
-          currentChar.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }
-
-      // =====================================================================
-      // FLASH ERROR (wrong key)
-      // =====================================================================
-
-      function flashError() {
-        const currentChar = document.getElementById("current-char");
-        if (currentChar) {
-          currentChar.classList.add("char-error");
-          setTimeout(() => {
-            currentChar.classList.remove("char-error");
-          }, 300);
+          currentChar.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "center",  // Keep at center of viewport
+            inline: "nearest" 
+          });
         }
       }
 
@@ -762,6 +793,9 @@
       function completeTest() {
         testState.active = false;
         testState.endTime = Date.now();
+
+        // Disable distraction-free mode
+        document.body.classList.remove("test-active");
 
         const elapsed = (testState.endTime - testState.startTime) / 1000;
         const minutes = Math.floor(elapsed / 60);
@@ -775,9 +809,7 @@
             100
         );
 
-        // Show completion modal
         showCompletionModal(wpm, accuracy, timeStr);
-
         updateStats();
       }
 
@@ -786,12 +818,10 @@
       // =====================================================================
 
       function showCompletionModal(wpm, accuracy, timeStr) {
-        // Create modal overlay
         const overlay = document.createElement("div");
         overlay.className = "modal-overlay";
         overlay.id = "completionModal";
 
-        // Create modal content
         overlay.innerHTML = `
           <div class="modal-content">
             <div class="modal-title">🎉 Test Complete!</div>
@@ -825,7 +855,6 @@
 
         document.body.appendChild(overlay);
 
-        // Close on clicking overlay
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) {
             closeModal();
