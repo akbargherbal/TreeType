@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tree-Sitter Typing Game - Phase 6 Complete</title>
+    <title>Tree-Sitter Typing Game - Session 27 (Pause Feature)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       /* Added for smooth scrolling on the root */
@@ -281,6 +281,74 @@
           opacity: 1;
         }
       }
+
+      /* ===================================================================== */
+      /* SESSION 27: PAUSE OVERLAY */
+      /* ===================================================================== */
+
+      .pause-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        animation: fadeIn 0.3s;
+        backdrop-filter: blur(4px);
+      }
+
+      .pause-content {
+        text-align: center;
+        color: #d4d4d4;
+        padding: 40px;
+        background: #2a2a2a;
+        border-radius: 12px;
+        border: 2px solid #f59e0b;
+        max-width: 450px;
+      }
+
+      .pause-icon {
+        font-size: 4em;
+        margin-bottom: 16px;
+        animation: pausePulse 2s infinite;
+      }
+
+      @keyframes pausePulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.7;
+          transform: scale(1.05);
+        }
+      }
+
+      .pause-kbd {
+        background: #374151;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.95em;
+        border: 1px solid #4b5563;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        display: inline-block;
+        margin: 0 4px;
+      }
+
+      /* Pause button active state */
+      .paused-state {
+        background: #10b981 !important;
+      }
+
+      .paused-state:hover {
+        background: #059669 !important;
+      }
     </style>
   </head>
   <body class="p-8">
@@ -347,18 +415,30 @@
             </label>
           </div>
 
-          <button
-            id="resetBtn"
-            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded ml-auto"
-          >
-            Reset (Esc)
-          </button>
+          <!-- SESSION 27: Grouped action buttons -->
+          <div class="flex gap-2 ml-auto">
+            <button
+              id="pauseBtn"
+              class="bg-yellow-600 hover:bg-yellow-700 px-3 py-2 rounded text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              onclick="togglePause()"
+              disabled
+            >
+              ⏸️ Pause
+            </button>
+
+            <button
+              id="resetBtn"
+              class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded text-sm font-semibold transition"
+            >
+              🔄 Reset
+            </button>
+          </div>
 
           <a
             href="library.html"
-            class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded"
+            class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded text-sm font-semibold"
           >
-            Browse Library
+            📚 Browse Library
           </a>
 
           <div id="testStatus" class="text-sm">
@@ -405,6 +485,10 @@
               >Red highlight</span
             >
             = Wrong key (stays until corrected)
+          </li>
+          <li>
+            • Press <kbd class="px-2 py-1 bg-gray-700 rounded">Tab</kbd> to
+            pause/resume
           </li>
           <li>
             • Press <kbd class="px-2 py-1 bg-gray-700 rounded">Esc</kbd> to
@@ -473,7 +557,7 @@
       };
 
       // =====================================================================
-      // STATE MANAGEMENT (SESSION 26: Added currentSnippetInfo)
+      // STATE MANAGEMENT (SESSION 27: Added pause state)
       // =====================================================================
 
       let currentData = null;
@@ -486,8 +570,11 @@
 
       let testState = {
         active: false,
+        paused: false,              // SESSION 27: Pause state
         startTime: null,
         endTime: null,
+        pauseStartTime: null,       // SESSION 27: When current pause began
+        totalPausedTime: 0,         // SESSION 27: Cumulative pause duration (ms)
         currentLineIndex: 0,
         currentCharIndex: 0,
         totalCharsTyped: 0,
@@ -495,6 +582,25 @@
         completedLines: new Set(),
         errorOnCurrentChar: false,
       };
+
+      // =====================================================================
+      // SESSION 27: GET ELAPSED TIME (EXCLUDING PAUSES)
+      // =====================================================================
+
+      function getElapsedTime() {
+        if (!testState.active || !testState.startTime) return 0;
+        
+        const now = Date.now();
+        let elapsedMs = now - testState.startTime - testState.totalPausedTime;
+        
+        // If currently paused, exclude the current pause duration
+        if (testState.paused && testState.pauseStartTime) {
+          const currentPauseDuration = now - testState.pauseStartTime;
+          elapsedMs -= currentPauseDuration;
+        }
+        
+        return elapsedMs / 1000; // Return seconds
+      }
 
       // =====================================================================
       // SESSION 26: STATS MANAGEMENT
@@ -538,10 +644,8 @@
           const metadata = await response.json();
           const snippets = metadata.snippets;
           
-          // Pick random snippet
           const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
           
-          // Navigate to it
           window.location.href = `index.html?snippet=${encodeURIComponent(randomSnippet.path)}`;
         } catch (error) {
           console.error("Error loading random snippet:", error);
@@ -641,13 +745,9 @@
           }
           rawData = await response.json();
 
-          // SESSION 26: Extract snippet info for stats tracking
           currentSnippetInfo.path = fetchPath;
           currentSnippetInfo.language = rawData.language;
           
-          // Generate snippet ID from path (matches library.html format)
-          // Example: "snippets/javascript/gm_01_001_01_array-methods.json" 
-          //       -> "javascript-gm_01_001_01_array-methods"
           const pathParts = fetchPath.split('/');
           const filename = pathParts[pathParts.length - 1].replace('.json', '');
           const lang = pathParts[pathParts.length - 2];
@@ -685,14 +785,17 @@
       }
 
       // =====================================================================
-      // RESET TEST
+      // RESET TEST (SESSION 27: Added pause state reset)
       // =====================================================================
 
       function resetTest() {
         testState = {
           active: false,
+          paused: false,              // SESSION 27
           startTime: null,
           endTime: null,
+          pauseStartTime: null,       // SESSION 27
+          totalPausedTime: 0,         // SESSION 27
           currentLineIndex: 0,
           currentCharIndex: 0,
           totalCharsTyped: 0,
@@ -713,9 +816,11 @@
         }
 
         document.body.classList.remove("test-active");
+        hidePauseOverlay(); // SESSION 27
 
         renderCode();
         updateStats();
+        updatePauseButton(); // SESSION 27
         updateStatus("Press any key to start...");
 
         requestAnimationFrame(() => {
@@ -733,6 +838,102 @@
             });
           }
         });
+      }
+
+      // =====================================================================
+      // SESSION 27: PAUSE/RESUME TOGGLE
+      // =====================================================================
+
+      function togglePause() {
+        if (!testState.active) {
+          console.log('Cannot pause: test not active');
+          return;
+        }
+        
+        if (testState.paused) {
+          // RESUME
+          console.log('Resuming test');
+          
+          const pauseDuration = Date.now() - testState.pauseStartTime;
+          testState.totalPausedTime += pauseDuration;
+          
+          testState.paused = false;
+          testState.pauseStartTime = null;
+          
+          hidePauseOverlay();
+          updatePauseButton();
+          updateStatus("Typing...", "success");
+          
+          document.getElementById("codeDisplay").focus();
+          
+        } else {
+          // PAUSE
+          console.log('Pausing test');
+          
+          testState.paused = true;
+          testState.pauseStartTime = Date.now();
+          
+          showPauseOverlay();
+          updatePauseButton();
+          updateStatus("Paused (Tab to resume)", "warning");
+        }
+        
+        updateStats();
+      }
+
+      // =====================================================================
+      // SESSION 27: PAUSE OVERLAY UI
+      // =====================================================================
+
+      function showPauseOverlay() {
+        hidePauseOverlay();
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'pauseOverlay';
+        overlay.className = 'pause-overlay';
+        overlay.innerHTML = `
+          <div class="pause-content">
+            <div class="pause-icon">⏸️</div>
+            <h2 class="text-3xl font-bold mb-4">Paused</h2>
+            <p class="text-lg mb-2">Press <kbd class="pause-kbd">Tab</kbd> to resume</p>
+            <p class="text-sm text-gray-400 mt-4">or <kbd class="pause-kbd">Esc</kbd> to reset test</p>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        overlay.addEventListener('click', togglePause);
+      }
+
+      function hidePauseOverlay() {
+        const overlay = document.getElementById('pauseOverlay');
+        if (overlay) {
+          overlay.remove();
+        }
+      }
+
+      // =====================================================================
+      // SESSION 27: UPDATE PAUSE BUTTON LABEL
+      // =====================================================================
+
+      function updatePauseButton() {
+        const btn = document.getElementById('pauseBtn');
+        if (!btn) return;
+        
+        if (testState.paused) {
+          btn.textContent = '▶️ Resume';
+          btn.classList.add('paused-state');
+        } else {
+          btn.textContent = '⏸️ Pause';
+          btn.classList.remove('paused-state');
+        }
+        
+        if (!testState.active) {
+          btn.disabled = true;
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
       }
 
       // =====================================================================
@@ -836,7 +1037,7 @@
       }
 
       // =====================================================================
-      // UPDATE STATS DISPLAY
+      // UPDATE STATS DISPLAY (SESSION 27: Modified for pause)
       // =====================================================================
 
       function updateStats() {
@@ -847,12 +1048,15 @@
           : "0/0";
         let wpm = 0;
         let accuracy = 100;
-        if (testState.active && testState.startTime) {
-          const elapsed = (Date.now() - testState.startTime) / 1000 / 60;
-          if (elapsed > 0) {
-            wpm = Math.round(testState.totalCharsTyped / 5 / elapsed);
+        
+        // SESSION 27: Only calculate WPM when active and not paused
+        if (testState.active && testState.startTime && !testState.paused) {
+          const elapsedMinutes = getElapsedTime() / 60;
+          if (elapsedMinutes > 0) {
+            wpm = Math.round(testState.totalCharsTyped / 5 / elapsedMinutes);
           }
         }
+        
         if (testState.totalCharsTyped > 0) {
           accuracy = Math.round(
             ((testState.totalCharsTyped - testState.totalErrors) /
@@ -899,10 +1103,37 @@
       }
 
       // =====================================================================
-      // KEYBOARD INPUT HANDLER (PHASE 3.5: PERSISTENT ERROR STATE)
+      // KEYBOARD INPUT HANDLER (SESSION 27: Added pause handling)
       // =====================================================================
 
       function handleKeyPress(event) {
+        // =====================================================================
+        // SESSION 27: TAB KEY FOR PAUSE/RESUME (HANDLE FIRST)
+        // =====================================================================
+        
+        if (event.key === 'Tab' && testState.active) {
+          event.preventDefault();
+          togglePause();
+          return;
+        }
+        
+        // =====================================================================
+        // BLOCK INPUT DURING PAUSE (EXCEPT ESC)
+        // =====================================================================
+        
+        if (testState.paused) {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            closeModal();
+            resetTest();
+          }
+          return; // Block all other input while paused
+        }
+        
+        // =====================================================================
+        // EXISTING SHORTCUTS
+        // =====================================================================
+        
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (event.key === "Escape") {
           event.preventDefault();
@@ -920,6 +1151,7 @@
           testState.startTime = Date.now();
           updateStatus("Typing...", "success");
           document.body.classList.add("test-active");
+          updatePauseButton(); // SESSION 27: Enable pause button
         }
 
         const currentLine = currentData.lines[testState.currentLineIndex];
@@ -1026,7 +1258,7 @@
       }
 
       // =====================================================================
-      // COMPLETE TEST (SESSION 26: Save stats!)
+      // COMPLETE TEST (SESSION 27: Uses getElapsedTime())
       // =====================================================================
 
       function completeTest() {
@@ -1034,7 +1266,8 @@
         testState.endTime = Date.now();
         document.body.classList.remove("test-active");
         
-        const elapsed = (testState.endTime - testState.startTime) / 1000;
+        // SESSION 27: Use getElapsedTime() for accurate timing
+        const elapsed = getElapsedTime();
         const minutes = Math.floor(elapsed / 60);
         const seconds = Math.floor(elapsed % 60);
         const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
@@ -1049,6 +1282,9 @@
         if (currentSnippetInfo.id) {
           saveSnippetStats(currentSnippetInfo.id, wpm, accuracy);
         }
+
+        // SESSION 27: Disable pause button on completion
+        updatePauseButton();
 
         showCompletionModal(wpm, accuracy, timeStr);
         updateStats();
