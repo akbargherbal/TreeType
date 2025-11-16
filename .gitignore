@@ -114,4 +114,4 @@ temp/
 # =====================================
 .env
 .env.*
-*.env.local
+*.env.localrename_references.sh

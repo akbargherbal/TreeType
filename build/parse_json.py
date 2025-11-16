@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-TreeType Parser - Refactored for Phase 6
-Converts source code files to TreeType JSON format
+treetype Parser - Refactored for Phase 6
+Converts source code files to treetype JSON format
 Supports: Python, JavaScript, TypeScript, TSX
 """
 
@@ -283,7 +283,7 @@ def process_file(input_path, output_path=None, quiet=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="TreeType Parser - Convert source code to typing snippets",
+        description="treetype Parser - Convert source code to typing snippets",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

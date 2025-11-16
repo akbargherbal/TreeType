@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TreeType Metadata Builder
+treetype Metadata Builder
 Scans snippets/ directory and generates metadata.json index
 """
 

@@ -1,4 +1,4 @@
-# TreeType - Build Programming Muscle Memory
+# treetype - Build Programming Muscle Memory
 
 A typing game for developers that helps you build muscle memory for programming constructs using real code snippets.
 
@@ -6,9 +6,9 @@ A typing game for developers that helps you build muscle memory for programming 
 
 ---
 
-## 🎯 What is TreeType?
+## 🎯 What is treetype?
 
-TreeType is a specialized typing trainer that uses **parsed code snippets** to help developers improve their typing speed and accuracy on real programming syntax. Unlike traditional typing games that use natural language, TreeType focuses on the unique challenges of coding:
+treetype is a specialized typing trainer that uses **parsed code snippets** to help developers improve their typing speed and accuracy on real programming syntax. Unlike traditional typing games that use natural language, treetype focuses on the unique challenges of coding:
 
 - Brackets, operators, and punctuation
 - Multi-line structures
@@ -36,8 +36,8 @@ Visit [GitHub Pages URL] and start typing immediately. No installation required.
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/TreeType.git
-cd TreeType
+git clone https://github.com/yourusername/treetype.git
+cd treetype
 
 # Start local server
 python -m http.server 8000
@@ -128,7 +128,7 @@ Type everything except whitespace and comments. Maximum challenge.
 
 ## 🏗️ Architecture
 
-TreeType uses a **static-first architecture** with zero backend:
+treetype uses a **static-first architecture** with zero backend:
 
 ```
 Your Machine          GitHub Repository          GitHub Pages
@@ -203,7 +203,7 @@ echo 'def test(): pass' > sources/python/test.py
 
 ### Parser (Tree-Sitter)
 
-TreeType uses [Tree-Sitter](https://tree-sitter.github.io/) to parse source code into an abstract syntax tree (AST), then converts it to a token-based JSON format optimized for progressive reveal typing.
+treetype uses [Tree-Sitter](https://tree-sitter.github.io/) to parse source code into an abstract syntax tree (AST), then converts it to a token-based JSON format optimized for progressive reveal typing.
 
 **Token Categories**:
 
@@ -334,7 +334,7 @@ MIT License - See LICENSE file for details
 
 ## 📧 Contact
 
-- **GitHub**: [yourusername/TreeType]
+- **GitHub**: [yourusername/treetype]
 - **Issues**: [Report bugs or request features]
 
 ---

@@ -1,5 +1,5 @@
 #!/bin/bash
-# TreeType Snippet Helper Script
+# treetype Snippet Helper Script
 # Automates: parse → build metadata → stage files
 
 set -e  # Exit on error
@@ -32,7 +32,7 @@ if [ ! -f "$INPUT_FILE" ]; then
 fi
 
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}TreeType Snippet Workflow${NC}"
+echo -e "${GREEN}treetype Snippet Workflow${NC}"
 echo -e "${GREEN}═══════════════════════════════════════════════════════════════════${NC}"
 echo ""
 
