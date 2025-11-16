@@ -1,2 +1,0 @@
-1) Write README.md from previous materials / chat sessions.
-2) Polish - non-typable chracter with the 4 languges in mind - how the user could build muscle memory - what are the type of characters that are redundant; for example TSX; <> are kind of everywhere; {} also .. so that makes sense to make them priority for non-typable chraacters.
