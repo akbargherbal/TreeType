@@ -1,501 +1,357 @@
-# TreeType
+# TreeType - Build Programming Muscle Memory
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+A typing game for developers that helps you build muscle memory for programming constructs using real code snippets.
 
-**Build muscle memory for programming constructs**
-
-TreeType is a typing trainer that helps developers practice typing actual code syntax, not just words. Using tree-sitter parsing, it intelligently extracts the meaningful parts of code and creates a focused, distraction-free typing experience.
+**Live Demo**: [Coming in Session 21 - GitHub Pages]
 
 ---
 
-## What is TreeType?
+## 🎯 What is TreeType?
 
-Traditional typing games make you type random words or prose. TreeType makes you type **real code** with proper syntax highlighting, indentation, and structure.
+TreeType is a specialized typing trainer that uses **parsed code snippets** to help developers improve their typing speed and accuracy on real programming syntax. Unlike traditional typing games that use natural language, TreeType focuses on the unique challenges of coding:
 
-As you type, the code progressively reveals itself through color—you're not just matching characters, you're **painting the code into existence**. It feels less like a test and more like creating something.
+- Brackets, operators, and punctuation
+- Multi-line structures
+- Indentation patterns
+- Language-specific syntax
 
-### What TreeType is NOT
+### ✨ Key Features
 
-- **Not a code editor** - It's a focused practice tool, not a replacement for your IDE
-- **Not a comprehensive typing tutor** - It assumes you already know how to type; it builds speed and accuracy on code-specific patterns
-- **Not a memorization tool** - You see the code you're typing; this is about muscle memory, not recall
-
----
-
-## Features
-
-### Core Experience
-
-- **Progressive reveal system** - Code starts gray and reveals its syntax colors as you type
-- **4 language support** - Python, JavaScript, TypeScript, and TSX/React
-- **3 typing modes** - Customize difficulty from minimal (keywords only) to full (everything)
-- **Real-time metrics** - Track WPM, accuracy, and time as you type
-- **Distraction-free mode** - Controls fade during typing, reveal on hover
-- **Persistent configuration** - Your language and mode preferences are saved
-
-### UX Features
-
-- **Smart scrolling** - Code stays centered as you progress, no jarring jumps
-- **Persistent error feedback** - Wrong keys turn red until corrected
-- **Automatic line advancement** - Seamlessly flows from line to line
-- **Completion celebration** - Beautiful modal with your final stats
-- **Keyboard-first design** - Esc to reset, any key to start, pure flow
+- **Progressive Reveal**: Type to "paint" code syntax highlighting into existence
+- **3 Difficulty Modes**: Minimal, Standard, and Full typing
+- **4 Languages**: Python, JavaScript, TypeScript, TSX/React
+- **Real-Time Metrics**: WPM, accuracy, completion time
+- **Custom Snippets**: Practice your own code (Phase 6)
+- **Zero Setup**: Runs entirely in the browser
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
+
+### Play Online
+
+Visit [GitHub Pages URL] and start typing immediately. No installation required.
+
+### Run Locally
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/TreeType.git
+cd TreeType
+
+# Start local server
+python -m http.server 8000
+
+# Visit http://localhost:8000
+```
+
+---
+
+## 📚 Custom Snippets (Phase 6)
+
+### Adding Your Own Code
+
+```bash
+# 1. Add source file to sources/
+cp ~/my-project/utils.py sources/python/
+
+# 2. Run the helper script
+./build/add_snippet.sh sources/python/utils.py
+
+# 3. Commit and push
+git commit -m "Add utils snippet"
+git push
+
+# 4. Snippet appears in library within 1 minute
+```
+
+### Supported File Types
+
+- `.py` → Python
+- `.js`, `.jsx` → JavaScript
+- `.ts` → TypeScript
+- `.tsx` → TSX/React
+
+### Snippet Guidelines
+
+**Ideal snippets**:
+
+- 5-50 lines (sweet spot: 10-20 lines)
+- Self-contained functions or components
+- Real production code (not tutorials)
+- Clear, idiomatic syntax
+
+**Avoid**:
+
+- Very long files (200+ lines)
+- Code with excessive comments
+- Minified or obfuscated code
+
+---
+
+## 🎮 How to Play
+
+### Controls
+
+- **Any key**: Start test
+- **Esc**: Reset test at any time
+- **Type**: Character by character (only typeable characters)
+
+### Visual Feedback
+
+- **Gray text**: Not yet typed
+- **Yellow highlight**: Current character to type
+- **Colored text**: Already typed (syntax revealed)
+- **Red highlight**: Wrong key (persists until corrected)
+
+### Typing Modes
+
+#### Minimal Mode ⚡
+
+Type only keywords and identifiers. Skip all punctuation and brackets.
+
+**Best for**: Speed practice, learning new syntax patterns
+
+#### Standard Mode ⭐ (Recommended)
+
+Type keywords, identifiers, operators, and essential punctuation (`:` `;`). Skip heavy pinky work (brackets).
+
+**Best for**: Balanced practice, real-world coding simulation
+
+#### Full Mode 🎯
+
+Type everything except whitespace and comments. Maximum challenge.
+
+**Best for**: Comprehensive practice, perfectionism
+
+---
+
+## 🏗️ Architecture
+
+TreeType uses a **static-first architecture** with zero backend:
+
+```
+Your Machine          GitHub Repository          GitHub Pages
+─────────────         ─────────────────         ─────────────
+sources/              snippets/                 Live Website
+  └── your-code.py      ├── metadata.json         ├── index.html
+                        └── python/               └── library.html
+                            └── your-code.json
+         │                      │                      │
+         └──[parse]──────────>  └──[deploy]──────────>
+```
+
+**Key insight**: No server needed. Parser runs offline, snippets are static files, GitHub Pages hosts everything for free.
+
+---
+
+## 🛠️ Development
 
 ### Prerequisites
 
-- Python 3.x (for local file server)
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-
-### Installation
-
-1. Clone or download this repository:
-
 ```bash
-git clone https://github.com/yourusername/TreeType.git
-cd TreeType
+pip install pandas tree-sitter tree-sitter-python tree-sitter-javascript tree-sitter-typescript
 ```
 
-2. Start a local web server:
-
-```bash
-python -m http.server 8000
-```
-
-3. Open your browser and navigate to:
-
-```
-http://localhost:8000/render_code.html
-```
-
-4. Select a language, choose a typing mode, and press any key to start!
-
-### First Use
-
-1. **Choose your language** - Start with Python if unsure (most readable)
-2. **Select Standard mode** - It's the recommended balance of challenge and speed
-3. **Click into the code area** - Or it will auto-focus when you press a key
-4. **Start typing** - Only type the highlighted yellow character
-5. **Press Esc anytime** - Reset and try again
-
----
-
-## Typing Modes Explained
-
-TreeType offers three preset modes that control what you actually type:
-
-### Minimal Mode
-
-**Type**: Keywords and identifiers only  
-**Skip**: All brackets, operators, punctuation, quotes, string content, comments
-
-**Use case**: Fastest typing, pure vocabulary focus. Great for warming up or learning new language syntax quickly.
-
-**Example**:
-
-```python
-def calculate(n: int) -> list:
-```
-
-You type: `defcalculatenintlist`
-
----
-
-### Standard Mode ⭐ (Recommended)
-
-**Type**: Keywords, identifiers, operators, parentheses `()`, and essential punctuation (`:`, `.`, `,`)  
-**Skip**: Curly braces `{}`, square brackets `[]`, angle brackets `<>`, semicolons, quotes, string content, comments
-
-**Use case**: Balanced practice with realistic code structure. You type the meaningful parts (including function calls) while reducing pinky strain from heavy bracket typing.
-
-**Example**:
-
-```javascript
-setIsActive(!isActive);
-```
-
-You type: `setIsActive(!isActive)` (parentheses and operators typed, semicolon auto-reveals)
-
-**Why this mode?**
-
-- ✅ Practices function call patterns `()` (most common in programming)
-- ✅ Includes operators and essential punctuation
-- ✅ Reduces pinky strain (no Shift+bracket combinations)
-- ✅ TSX/JSX friendly (angle brackets auto-reveal)
-
----
-
-### Full Mode
-
-**Type**: Everything except whitespace and comments/string content  
-**Skip**: Only whitespace, comments, and string content
-
-**Use case**: Maximum muscle memory building. Every bracket, every operator, every character. Closest to real coding.
-
-**Example**:
-
-```python
-def calculate(n: int) -> list:
-```
-
-You type: `defcalculate(n:int)->list:`
-
----
-
-## How It Works
-
-### Architecture Overview
-
-TreeType uses a two-stage architecture:
-
-1. **Parser (Python)** - Analyzes code using tree-sitter and exports structured JSON
-2. **Renderer (JavaScript)** - Consumes JSON and creates the interactive typing experience
-
-### Tree-Sitter Parsing
-
-Tree-sitter is a parsing library that understands code syntax at a deep level. TreeType uses it to:
-
-- Extract all tokens (keywords, identifiers, operators, etc.)
-- Classify tokens into 9 categories for granular filtering
-- Preserve exact positioning and indentation
-- Handle multi-line constructs correctly (docstrings, template literals, JSX)
-
-### Token Categorization
-
-Every token in the parsed code gets assigned to one or more categories:
-
-| Category           | Examples                           | Use                      |
-| ------------------ | ---------------------------------- | ------------------------ |
-| `comment`          | `#`, `//`, `/* */`                 | Comments and docstrings  |
-| `string_content`   | Text inside `"..."` or `` `...` `` | String literal content   |
-| `string_delimiter` | `"`, `'`, `` ` ``                  | Quote characters         |
-| `punctuation`      | `:`, `;`, `,`, `.`                 | Structural punctuation   |
-| `parenthesis`      | `(`, `)`                           | Function calls, grouping |
-| `curly_brace`      | `{`, `}`                           | Blocks, objects, JSX     |
-| `square_bracket`   | `[`, `]`                           | Arrays, indexing         |
-| `angle_bracket`    | `<`, `>`, `</`, `/>`               | JSX/TSX tags             |
-| `operator`         | `=`, `+`, `->`, `=>`               | Operators                |
-
-These categories power the preset filtering system. Each mode excludes different categories to create the desired typing experience.
-
-### Progressive Reveal System
-
-The magic of TreeType is how code "appears" as you type:
-
-1. **Gray text** = Not yet typed (neutral canvas)
-2. **Yellow highlight** = Current character to type
-3. **Syntax colors** = Already typed (code revealed)
-4. **Red highlight** = Error (stays until corrected)
-
-Non-typeable tokens (like curly braces in Standard mode) automatically transition from gray → colored as your cursor passes them, creating a smooth "painting" effect.
-
-### Client-Side Filtering
-
-When you switch typing modes, TreeType doesn't reload the file—it regenerates the typing sequence on the fly:
-
-1. Filter `display_tokens` based on preset's exclusion rules
-2. Rebuild `typing_sequence` from remaining typeable tokens
-3. Regenerate `char_map` (character index → display position mapping)
-4. Reset test and re-render
-
-This happens instantly and allows mid-test preset switching.
-
----
-
-## Controls & Keyboard Shortcuts
-
-### During Typing
-
-- **Any key** - Start test from ready state
-- **Character keys** - Type the highlighted character
-- **Esc** - Reset test immediately, return to ready state
-
-### Anytime
-
-- **Hover over controls** - Reveal faded controls during active typing
-- **Click Reset button** - Same as Esc key
-- **Change language** - Dropdown in header (resets test)
-- **Change typing mode** - Radio buttons (resets test)
-
-### Completion Modal
-
-- **Retry Test** - Reset with same language/mode
-- **Change Language** - Close modal, modify settings
-- **Esc or click outside** - Close modal
-
----
-
-## Technical Details (For Developers)
-
-### File Structure
+### Project Structure
 
 ```
 TreeType/
-├── parse_json.py              # Python parser (tree-sitter → JSON)
-├── render_code.html           # Frontend application (single file)
-├── output/
-│   └── json_samples/          # Pre-generated code samples
-│       ├── python_sample.json
-│       ├── javascript_sample.json
-│       ├── typescript_sample.json
-│       └── tsx_sample.json
-└── README.md                  # This file
+├── build/                      # Build tools
+│   ├── parse_json.py          # CLI parser
+│   ├── build_metadata.py      # Metadata generator
+│   └── add_snippet.sh         # Workflow automation
+├── snippets/                   # Static library (committed)
+│   ├── metadata.json          # Master index
+│   └── <language>/            # Language-organized snippets
+├── sources/                    # Personal code (gitignored)
+│   └── <language>/            # Your source files
+├── index.html                  # Main typing game
+└── library.html                # Snippet browser (Session 21)
 ```
 
-### Parser Architecture (`parse_json.py`)
+### Adding New Snippets
 
-**Key functions**:
+```bash
+# Manual workflow
+python build/parse_json.py sources/python/myfile.py
+python build/build_metadata.py
+git add snippets/ && git commit && git push
 
-- `categorize_token()` - Assigns category labels to tokens (9 categories including split brackets)
-- `is_non_typeable()` - Marks structural whitespace as non-typeable
-- `parse_code_to_dataframe()` - Tree-sitter → Pandas DataFrame
-- `dataframe_to_json()` - DataFrame → Frontend-ready JSON
-
-**JSON output structure**:
-
-```json
-{
-  "language": "python",
-  "total_lines": 10,
-  "lines": [
-    {
-      "line_number": 0,
-      "indent_level": 0,
-      "actual_line": "def calculate(n: int):",
-      "display_tokens": [
-        {
-          "text": "def",
-          "type": "keyword",
-          "categories": [],
-          "base_typeable": true,
-          "start_col": 0,
-          "end_col": 3
-        },
-        {
-          "text": "(",
-          "type": "(",
-          "categories": ["parenthesis"],
-          "base_typeable": true,
-          "start_col": 13,
-          "end_col": 14
-        }
-      ],
-      "typing_sequence": "defcalculatenint",
-      "char_map": {
-        "0": { "token_idx": 0, "display_col": 0 }
-      }
-    }
-  ]
-}
+# Automated workflow (recommended)
+./build/add_snippet.sh sources/python/myfile.py
+git commit -m "Add myfile snippet"
+git push
 ```
 
-### Frontend Implementation (`render_code.html`)
+### Testing Locally
 
-**Core functions**:
+```bash
+# Start local server
+python -m http.server 8000
 
-- `applyExclusionConfig()` - Client-side filtering based on preset
-- `renderLineTokens()` - Applies progressive reveal states to each character
-- `handleKeyPress()` - Validates input, manages error persistence
-- `moveToNextLine()` - Advances to next typeable line, triggers scroll
-- `manualSmartScroll()` - Ergonomic centering with down-only constraint
-- `completeTest()` - Calculates metrics, displays modal
+# Visit http://localhost:8000
 
-**State management**:
+# Test snippet workflow
+echo 'def test(): pass' > sources/python/test.py
+./build/add_snippet.sh sources/python/test.py
+```
+
+---
+
+## 📊 Technical Details
+
+### Parser (Tree-Sitter)
+
+TreeType uses [Tree-Sitter](https://tree-sitter.github.io/) to parse source code into an abstract syntax tree (AST), then converts it to a token-based JSON format optimized for progressive reveal typing.
+
+**Token Categories**:
+
+- `keyword`, `identifier`, `type_identifier`
+- `comment`, `string_content`, `string_delimiter`
+- `operator`, `punctuation`
+- `parenthesis`, `curly_brace`, `square_bracket`, `angle_bracket`
+
+Each token includes:
+
+- Text content
+- Syntax type
+- Categories (for filtering)
+- Position metadata
+- Typeability flag
+
+### Typing Modes (Config System)
+
+Each mode defines which token categories to exclude:
 
 ```javascript
-testState = {
-  active: false, // Is test running?
-  startTime: null, // Timestamp of first keystroke
-  currentLineIndex: 0, // Which line is active
-  currentCharIndex: 0, // Position in typing_sequence
-  totalCharsTyped: 0, // Correct chars (for WPM)
-  totalErrors: 0, // Wrong keystrokes
-  completedLines: Set, // Lines fully typed
-  errorOnCurrentChar: false, // Is current char in error state?
+PRESETS = {
+  minimal: {
+    exclude: [
+      "parenthesis",
+      "curly_brace",
+      "square_bracket",
+      "angle_bracket",
+      "operator",
+      "punctuation",
+      "string_content",
+      "string_delimiter",
+      "comment",
+    ],
+  },
+  standard: {
+    exclude: [
+      "curly_brace",
+      "square_bracket",
+      "angle_bracket",
+      "string_content",
+      "string_delimiter",
+      "comment",
+    ],
+    includeSpecific: [":", ";", ".", ",", "(", ")"],
+  },
+  full: {
+    exclude: ["comment", "string_content"],
+  },
 };
 ```
 
-**Preset filtering logic**:
+The frontend dynamically regenerates the typing sequence based on the selected preset.
 
-Each preset defines:
+### Progressive Reveal System
 
-- `exclude` - Array of categories to skip
-- `includeSpecific` - Array of specific characters to include (overrides category exclusion)
+As you type, characters transition through states:
 
-Example (Standard mode):
+1. **Untyped** (gray): Not yet reached
+2. **Current** (yellow highlight): Next character to type
+3. **Typed** (syntax-colored): Already typed correctly
+4. **Error** (red highlight): Wrong key pressed
 
-```javascript
-{
-  exclude: [
-    "curly_brace",
-    "square_bracket",
-    "angle_bracket",
-    "punctuation",
-    "string_content",
-    "string_delimiter",
-    "comment"
-  ],
-  includeSpecific: [":", ".", ",", "(", ")"]  // Essential punctuation + parentheses
-}
-```
-
-### Configuration Persistence
-
-User preferences are saved to `localStorage`:
-
-```javascript
-{
-  "preset": "standard",    // Last selected typing mode
-  "language": "python"     // Last selected language
-}
-```
-
-Loaded on page load, saved on every change.
+Non-typeable tokens (excluded by preset) automatically transition from gray to colored as the cursor passes them.
 
 ---
 
-## Development Philosophy
+## 🎯 Phase Roadmap
 
-TreeType was built using a phased, validation-driven approach:
+### Phase 1-5 ✅ Complete
 
-### Principles
+- Static rendering and syntax highlighting
+- Typing sequence logic
+- Progressive reveal UX
+- Configuration UI with 3 presets
+- Enhanced keyboard controls
 
-1. **Baseline first** - Prove each layer works before adding complexity
-2. **Incremental validation** - Each phase has clear success criteria
-3. **Low-risk assumptions** - Test what we think we know
-4. **Rollback-friendly** - Each phase is independently functional
-5. **UX-driven iteration** - Respond to user feedback and discoveries
+### Phase 6 ⏳ In Progress (Session 20/21/22)
 
-### Why This Matters
+- **Session 20** ✅: Repository restructure, metadata builder
+- **Session 21** 🔜: GitHub Pages, library browser UI
+- **Session 22** ⏳: Stats tracking, export/import
 
-Traditional typing games feel mechanical—you're matching characters, not creating. TreeType's progressive reveal system transforms typing from validation into creation. Every keystroke reveals structure and meaning.
-
-This UX breakthrough emerged from testing, not planning. Phase 3's "auto-jump" experiment failed, leading to the insight that non-typeable elements should auto-reveal rather than require explicit skipping. That insight became the core of the experience.
-
-**Good software emerges from iteration, not specification.**
-
----
-
-## Roadmap
-
-### ✅ Completed Phases
-
-- **Phase 1** - Static rendering (tree-sitter parsing, syntax highlighting)
-- **Phase 2** - Typing sequence logic (cursor tracking, character validation)
-- **Phase 3** - Auto-jump experimentation (tested and rejected in favor of progressive reveal)
-- **Phase 3.5** - Progressive reveal UX (the core experience, emerged from Phase 3 learnings)
-- **Phase 5** - Configuration UI (3 presets, client-side filtering, persistence)
-- **Phase 5 Polish** - README creation, UI polish, production-ready status
-- **Phase 5.3** - Ergonomic preset refinement (split bracket categories, balanced Standard mode)
-
-### 📜 Planned Phases
-
-#### Phase 6: File Upload & Snippet Management
-
-- Upload your own code files
-- Practice your actual codebase
-- Build a personal snippet library
-- Tag and organize practice materials
-
-#### Phase 7: Polish & Public Release
+### Phase 7 📋 Future
 
 - Performance optimization
 - Accessibility improvements
 - Additional keyboard shortcuts
-- Analytics and progress tracking
-- Help system and onboarding
-- Theme customization
-- Public deployment
+- Help/onboarding
+- Analytics
 
 ---
 
-## Project History
+## 🤝 Contributing
 
-TreeType emerged from a simple question: "Why do typing games make you type prose when developers type code?"
+Contributions welcome! This project is currently in active development (Phase 6).
 
-The project evolved through **17 development sessions** over several weeks, with each phase validating assumptions and iterating on UX. Key milestones:
+### Ways to Contribute
 
-- **Session 1-4** - Proved tree-sitter parsing works, built static renderer
-- **Session 5-6** - Added typing logic, character-by-character advancement
-- **Session 7** - Experimented with auto-jump (ultimately rejected)
-- **Session 8-11** - Built progressive reveal system (the breakthrough moment)
-- **Session 12** - Fixed critical scroll bug via systematic debugging
-- **Session 13** - Implemented full configuration system
-- **Session 14** - Systematic testing, fixed hover and reveal bugs, Phase 5 sign-off
-- **Session 15** - Planning quick wins for Phase 5 polish
-- **Session 16** - README creation, UI polish (4 bug fixes), production-ready status
-- **Session 17** - Split bracket categories for ergonomic Standard mode, balanced presets
+- **Add snippets**: Share useful code snippets via PR
+- **Report bugs**: Open issues for bugs or UX problems
+- **Suggest features**: Ideas for improvements
+- **Test languages**: Help test with different codebases
 
-For detailed development history, see:
+### Development Guidelines
 
-- `phased_plan.md` - Overall vision and roadmap
-- `session_*.md` - Individual session notes and decisions
-- Git commit history - Code evolution
+- Follow existing code style
+- Test locally before submitting PR
+- Add snippets to appropriate `snippets/<language>/` directory
+- Update metadata with `python build/build_metadata.py`
 
 ---
 
-## Contributing
+## 📝 License
 
-TreeType is currently in active development. The codebase is stable and the core experience is polished, but the project is pre-Phase 6.
-
-### Feedback Welcome
-
-If you use TreeType and have thoughts on:
-
-- UX friction points
-- Typing mode balance (too easy/hard?)
-- Language support priorities
-- Feature suggestions
-- Bugs or issues
-
-Please open an issue! Real-world usage insights are invaluable.
-
-### Code Contributions
-
-Not accepting pull requests yet—the architecture may change significantly in Phase 6/7. Check back after public release.
+MIT License - See LICENSE file for details
 
 ---
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- **Tree-sitter** - The parsing library that makes intelligent code analysis possible
-- **Tailwind CSS** - Rapid UI development with utility classes
-- **VS Code Dark+** - Syntax highlighting theme inspiration
-
----
-
-## Questions?
-
-### Why not use existing typing trainers?
-
-Traditional typing trainers focus on prose or random words. Code has unique patterns:
-
-- Frequent use of brackets, operators, punctuation
-- Significant indentation and structure
-- Language-specific syntax
-- Less common character combinations
-
-TreeType is purpose-built for these patterns.
-
-### Why only 4 languages?
-
-Tree-sitter supports 40+ languages, but these 4 cover the most common web/data development scenarios. Adding languages is straightforward—each requires a parser import and sample file. Phase 6 will let users upload their own code in any supported language.
-
-### Can I use this offline?
-
-Yes! Once you've cloned the repo and generated the JSON samples, everything runs locally. No internet required after initial setup.
-
-### Why is the full app in a single HTML file?
-
-Simplicity. For a project this size, bundling tools add complexity without benefit. Everything is readable and hackable in one place. May split into modules in Phase 7 if complexity demands it.
-
-### What's the WPM calculation?
-
-Standard typing metric: (characters typed / 5) / (time in minutes). The "5" is the industry standard for average word length. So 300 characters in 1 minute = 60 WPM.
+- [Tree-Sitter](https://tree-sitter.github.io/) - Parsing library
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [VS Code Dark+ Theme](https://code.visualstudio.com/) - Color scheme inspiration
+- Inspired by [MonkeyType](https://monkeytype.com/) and similar typing trainers
 
 ---
 
-**Ready to build muscle memory for code? Clone, run, and start typing!** 🚀
+## 📧 Contact
+
+- **GitHub**: [yourusername/TreeType]
+- **Issues**: [Report bugs or request features]
+
+---
+
+## 🎉 Fun Stats
+
+- **Languages supported**: 4 (Python, JS, TS, TSX)
+- **Typing modes**: 3 (Minimal, Standard, Full)
+- **Sample snippets**: 4 (more coming in Session 21)
+- **Lines of code**: ~1,500 (HTML + JS)
+- **Backend code**: 0 (static-first architecture)
+- **Hosting cost**: $0/month (GitHub Pages)
+
+---
+
+**Built with ❤️ for developers who want to type code faster**
+
+---
+
+_Last updated: Session 20 - Phase 6 in progress_
