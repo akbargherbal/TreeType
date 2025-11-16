@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tree-Sitter Typing Game - Phase 5.2 Configuration UI</title>
+    <title>Tree-Sitter Typing Game - Phase 6 Complete</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       /* Added for smooth scrolling on the root */
@@ -232,6 +232,7 @@
         gap: 12px;
         justify-content: center;
         margin: 0;
+        flex-wrap: wrap;
       }
 
       .modal-button {
@@ -307,7 +308,7 @@
             <option value="tsx">TSX/React</option>
           </select>
 
-          <!-- NEW: Typing Mode Selector -->
+          <!-- Typing Mode Selector -->
           <label class="text-gray-300 ml-6">Typing Mode:</label>
           <div class="flex gap-2">
             <label
@@ -352,6 +353,13 @@
           >
             Reset (Esc)
           </button>
+
+          <a
+            href="library.html"
+            class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded"
+          >
+            Browse Library
+          </a>
 
           <div id="testStatus" class="text-sm">
             <span class="text-gray-400">Press any key to start...</span>
@@ -447,15 +455,14 @@
           name: "Standard",
           description: "Balanced practice without pinky strain (recommended)",
           exclude: [
-            "curly_brace", // Excluded: Heavy pinky work
-            "square_bracket", // Excluded: Heavy pinky work
-            "angle_bracket", // Excluded: TSX/JSX specific
+            "curly_brace",
+            "square_bracket",
+            "angle_bracket",
             "string_content",
-            "punctuation", // ← ADD THIS LINE
+            "punctuation",
             "string_delimiter",
             "comment",
           ],
-          // Special handling: include essential punctuation + parentheses
           includeSpecific: [":", ".", ",", "(", ")"],
         },
         full: {
@@ -466,11 +473,17 @@
       };
 
       // =====================================================================
-      // STATE MANAGEMENT
+      // STATE MANAGEMENT (SESSION 26: Added currentSnippetInfo)
       // =====================================================================
 
       let currentData = null;
-      let rawData = null; // Store original unfiltered data
+      let rawData = null;
+      let currentSnippetInfo = {
+        path: null,
+        id: null,
+        language: null
+      };
+
       let testState = {
         active: false,
         startTime: null,
@@ -484,27 +497,76 @@
       };
 
       // =====================================================================
+      // SESSION 26: STATS MANAGEMENT
+      // =====================================================================
+
+      function loadSnippetStats() {
+        const saved = localStorage.getItem("treetype_snippet_stats");
+        return saved ? JSON.parse(saved) : {};
+      }
+
+      function saveSnippetStats(snippetId, wpm, accuracy) {
+        const stats = loadSnippetStats();
+        
+        if (!stats[snippetId]) {
+          stats[snippetId] = {
+            bestWPM: wpm,
+            bestAccuracy: accuracy,
+            practiceCount: 1,
+            lastPracticed: new Date().toISOString()
+          };
+        } else {
+          stats[snippetId].bestWPM = Math.max(stats[snippetId].bestWPM || 0, wpm);
+          stats[snippetId].bestAccuracy = Math.max(stats[snippetId].bestAccuracy || 0, accuracy);
+          stats[snippetId].practiceCount = (stats[snippetId].practiceCount || 0) + 1;
+          stats[snippetId].lastPracticed = new Date().toISOString();
+        }
+
+        localStorage.setItem("treetype_snippet_stats", JSON.stringify(stats));
+        console.log('Stats saved:', snippetId, stats[snippetId]);
+      }
+
+      // =====================================================================
+      // SESSION 26: RANDOM SNIPPET SELECTOR
+      // =====================================================================
+
+      async function loadRandomSnippet() {
+        try {
+          const response = await fetch("snippets/metadata.json");
+          if (!response.ok) throw new Error("Cannot fetch metadata");
+          
+          const metadata = await response.json();
+          const snippets = metadata.snippets;
+          
+          // Pick random snippet
+          const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
+          
+          // Navigate to it
+          window.location.href = `index.html?snippet=${encodeURIComponent(randomSnippet.path)}`;
+        } catch (error) {
+          console.error("Error loading random snippet:", error);
+          alert("Could not load random snippet. Please try again.");
+        }
+      }
+
+      // =====================================================================
       // APPLY EXCLUSION CONFIG (PHASE 5.2)
       // =====================================================================
 
       function applyExclusionConfig(lineData, preset) {
         const config = PRESETS[preset];
 
-        // Filter tokens based on preset
         const filteredTokens = lineData.display_tokens.map((token) => {
           let typeable = token.base_typeable;
 
-          // If token is not base_typeable, keep it that way
           if (!typeable) {
             return { ...token, typeable };
           }
 
-          // If token has no categories, it's a keyword/identifier - always typeable
           if (!token.categories || token.categories.length === 0) {
             return { ...token, typeable: true };
           }
 
-          // Check if token should be specifically included (Standard mode: :, ;, (, ), etc.)
           if (
             config.includeSpecific &&
             config.includeSpecific.includes(token.text)
@@ -512,7 +574,6 @@
             return { ...token, typeable: true };
           }
 
-          // Check if any of the token's categories are in the exclusion list
           for (const category of token.categories) {
             if (config.exclude.includes(category)) {
               typeable = false;
@@ -523,13 +584,11 @@
           return { ...token, typeable };
         });
 
-        // Regenerate typing_sequence from typeable tokens
         const typingSequence = filteredTokens
           .filter((t) => t.typeable)
           .map((t) => t.text)
           .join("");
 
-        // Regenerate char_map
         const charMap = {};
         let charIdx = 0;
         const typeableTokens = filteredTokens.filter((t) => t.typeable);
@@ -553,20 +612,17 @@
       }
 
       // =====================================================================
-      // LOAD LANGUAGE DATA (UPDATED FOR PHASE 5.2)
+      // LOAD LANGUAGE DATA (SESSION 26: Track snippet info)
       // =====================================================================
 
       async function loadLanguage(language) {
-        // Check for URL parameter (snippet path from library)
         const urlParams = new URLSearchParams(window.location.search);
         const snippetPath = urlParams.get("snippet");
 
         let fetchPath;
         if (snippetPath) {
-          // Load specific snippet from library
           fetchPath = snippetPath;
         } else {
-          // Load a default snippet for each language (first one alphabetically)
           const defaultSnippets = {
             python:
               "snippets/python/gm_01_001_02_03_core-python-patterns-quick-refresh.json",
@@ -585,12 +641,24 @@
           }
           rawData = await response.json();
 
-          // Get current preset
+          // SESSION 26: Extract snippet info for stats tracking
+          currentSnippetInfo.path = fetchPath;
+          currentSnippetInfo.language = rawData.language;
+          
+          // Generate snippet ID from path (matches library.html format)
+          // Example: "snippets/javascript/gm_01_001_01_array-methods.json" 
+          //       -> "javascript-gm_01_001_01_array-methods"
+          const pathParts = fetchPath.split('/');
+          const filename = pathParts[pathParts.length - 1].replace('.json', '');
+          const lang = pathParts[pathParts.length - 2];
+          currentSnippetInfo.id = `${lang}-${filename}`;
+
+          console.log('Loaded snippet:', currentSnippetInfo);
+
           const preset = document.querySelector(
             'input[name="typingMode"]:checked'
           ).value;
 
-          // Apply filtering to all lines
           currentData = {
             ...rawData,
             lines: rawData.lines.map((line) =>
@@ -600,7 +668,6 @@
 
           resetTest();
 
-          // CRITICAL: Focus the code display area after loading
           setTimeout(() => {
             document.getElementById("codeDisplay").focus();
           }, 100);
@@ -634,7 +701,6 @@
           errorOnCurrentChar: false,
         };
 
-        // CRITICAL FIX: Skip to first line with typeable content
         if (currentData) {
           while (
             testState.currentLineIndex < currentData.total_lines &&
@@ -668,6 +734,7 @@
           }
         });
       }
+
       // =====================================================================
       // RENDER CODE
       // =====================================================================
@@ -748,11 +815,9 @@
             tokenSpan.className = baseCssClass;
 
             if (isCompletedLine) {
-              // Line complete - show colored
             } else if (isFutureLine) {
               tokenSpan.classList.add("char-untyped");
             } else if (isCurrentLine) {
-              // FIX: Use char_map to find current display position
               const currentCharInfo =
                 lineData.char_map[String(testState.currentCharIndex)];
               const currentDisplayCol = currentCharInfo?.display_col || 0;
@@ -796,7 +861,6 @@
           );
         }
 
-        // Get current preset name
         const preset = document.querySelector(
           'input[name="typingMode"]:checked'
         ).value;
@@ -842,7 +906,7 @@
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (event.key === "Escape") {
           event.preventDefault();
-          closeModal(); // Close modal if open
+          closeModal();
           resetTest();
           return;
         }
@@ -962,13 +1026,14 @@
       }
 
       // =====================================================================
-      // COMPLETE TEST
+      // COMPLETE TEST (SESSION 26: Save stats!)
       // =====================================================================
 
       function completeTest() {
         testState.active = false;
         testState.endTime = Date.now();
         document.body.classList.remove("test-active");
+        
         const elapsed = (testState.endTime - testState.startTime) / 1000;
         const minutes = Math.floor(elapsed / 60);
         const seconds = Math.floor(elapsed % 60);
@@ -979,12 +1044,18 @@
             testState.totalCharsTyped) *
             100
         );
+
+        // SESSION 26: Save stats to localStorage
+        if (currentSnippetInfo.id) {
+          saveSnippetStats(currentSnippetInfo.id, wpm, accuracy);
+        }
+
         showCompletionModal(wpm, accuracy, timeStr);
         updateStats();
       }
 
       // =====================================================================
-      // SHOW COMPLETION MODAL
+      // SHOW COMPLETION MODAL (SESSION 26: Updated buttons)
       // =====================================================================
 
       function showCompletionModal(wpm, accuracy, timeStr) {
@@ -1012,23 +1083,28 @@
 
       <div class="modal-buttons">
         <button class="modal-button modal-button-primary" onclick="retryTest()">
-          Retry Test
+          🔄 Retry
+        </button>
+        <button
+          class="modal-button modal-button-primary"
+          onclick="loadRandomSnippet()"
+        >
+          🎲 Random Snippet
         </button>
         <button
           class="modal-button modal-button-secondary"
           onclick="window.location.href='library.html'"
         >
-          Back to Library
+          📚 Back to Library
         </button>
         <button
           class="modal-button modal-button-secondary"
           onclick="closeModal()"
         >
-          Change Language
+          ⚙️ Change Settings
         </button>
       </div>
     </div>
-
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener("click", (e) => {
@@ -1128,7 +1204,6 @@
           saveConfig();
         });
 
-      // NEW: Add event listener for preset changes
       document.querySelectorAll('input[name="typingMode"]').forEach((radio) => {
         radio.addEventListener("change", () => {
           if (rawData) {
@@ -1136,7 +1211,6 @@
               'input[name="typingMode"]:checked'
             ).value;
 
-            // Reapply filtering to all lines
             currentData = {
               ...rawData,
               lines: rawData.lines.map((line) =>
@@ -1161,11 +1235,9 @@
       });
       document.addEventListener("keydown", handleKeyPress);
 
-      // NEW: Load saved config on page load
       document.addEventListener("DOMContentLoaded", () => {
         const config = loadConfig();
 
-        // Set preset
         const presetRadio = document.querySelector(
           `input[name="typingMode"][value="${config.preset}"]`
         );
@@ -1173,10 +1245,8 @@
           presetRadio.checked = true;
         }
 
-        // Set language
         document.getElementById("languageSelect").value = config.language;
 
-        // Load language with saved config
         loadLanguage(config.language);
         document.getElementById("codeDisplay").focus();
       });
