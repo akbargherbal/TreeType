@@ -514,47 +514,30 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
       // =====================================================================
-      // PRESET CONFIGURATIONS (PHASE 5.2)
+      // IMPORTS FROM TYPESCRIPT MODULES
       // =====================================================================
 
-      const PRESETS = {
-        minimal: {
-          name: "Minimal",
-          description: "Type only keywords and identifiers",
-          exclude: [
-            "parenthesis",
-            "curly_brace",
-            "square_bracket",
-            "angle_bracket",
-            "operator",
-            "punctuation",
-            "string_content",
-            "string_delimiter",
-            "comment",
-          ],
-        },
-        standard: {
-          name: "Standard",
-          description: "Balanced practice without pinky strain (recommended)",
-          exclude: [
-            "curly_brace",
-            "square_bracket",
-            "angle_bracket",
-            "string_content",
-            "punctuation",
-            "string_delimiter",
-            "comment",
-          ],
-          includeSpecific: [":", ".", ",", "(", ")"],
-        },
-        full: {
-          name: "Full",
-          description: "Type everything except whitespace and comments",
-          exclude: ["comment", "string_content"],
-        },
-      };
+      import {
+        getElapsedTime,
+        calculateWPM,
+        calculateAccuracy,
+        formatTime,
+      } from "./src/core/timer.js";
+
+      import {
+        PRESETS,
+        DEFAULT_CONFIG,
+        applyExclusionConfig,
+        loadConfig,
+        saveConfig,
+      } from "./src/core/config.js";
+
+      import {
+        loadSnippetStats,
+        saveSnippetStats,
+      } from "./src/core/storage.js";
 
       // =====================================================================
       // STATE MANAGEMENT (SESSION 27: Added pause state)
@@ -565,16 +548,16 @@
       let currentSnippetInfo = {
         path: null,
         id: null,
-        language: null
+        language: null,
       };
 
       let testState = {
         active: false,
-        paused: false,              // SESSION 27: Pause state
+        paused: false, // SESSION 27: Pause state
         startTime: null,
         endTime: null,
-        pauseStartTime: null,       // SESSION 27: When current pause began
-        totalPausedTime: 0,         // SESSION 27: Cumulative pause duration (ms)
+        pauseStartTime: null, // SESSION 27: When current pause began
+        totalPausedTime: 0, // SESSION 27: Cumulative pause duration (ms)
         currentLineIndex: 0,
         currentCharIndex: 0,
         totalCharsTyped: 0,
@@ -584,55 +567,6 @@
       };
 
       // =====================================================================
-      // SESSION 27: GET ELAPSED TIME (EXCLUDING PAUSES)
-      // =====================================================================
-
-      function getElapsedTime() {
-        if (!testState.active || !testState.startTime) return 0;
-        
-        const now = Date.now();
-        let elapsedMs = now - testState.startTime - testState.totalPausedTime;
-        
-        // If currently paused, exclude the current pause duration
-        if (testState.paused && testState.pauseStartTime) {
-          const currentPauseDuration = now - testState.pauseStartTime;
-          elapsedMs -= currentPauseDuration;
-        }
-        
-        return elapsedMs / 1000; // Return seconds
-      }
-
-      // =====================================================================
-      // SESSION 26: STATS MANAGEMENT
-      // =====================================================================
-
-      function loadSnippetStats() {
-        const saved = localStorage.getItem("treetype_snippet_stats");
-        return saved ? JSON.parse(saved) : {};
-      }
-
-      function saveSnippetStats(snippetId, wpm, accuracy) {
-        const stats = loadSnippetStats();
-        
-        if (!stats[snippetId]) {
-          stats[snippetId] = {
-            bestWPM: wpm,
-            bestAccuracy: accuracy,
-            practiceCount: 1,
-            lastPracticed: new Date().toISOString()
-          };
-        } else {
-          stats[snippetId].bestWPM = Math.max(stats[snippetId].bestWPM || 0, wpm);
-          stats[snippetId].bestAccuracy = Math.max(stats[snippetId].bestAccuracy || 0, accuracy);
-          stats[snippetId].practiceCount = (stats[snippetId].practiceCount || 0) + 1;
-          stats[snippetId].lastPracticed = new Date().toISOString();
-        }
-
-        localStorage.setItem("treetype_snippet_stats", JSON.stringify(stats));
-        console.log('Stats saved:', snippetId, stats[snippetId]);
-      }
-
-      // =====================================================================
       // SESSION 26: RANDOM SNIPPET SELECTOR
       // =====================================================================
 
@@ -640,79 +574,20 @@
         try {
           const response = await fetch("snippets/metadata.json");
           if (!response.ok) throw new Error("Cannot fetch metadata");
-          
+
           const metadata = await response.json();
           const snippets = metadata.snippets;
-          
-          const randomSnippet = snippets[Math.floor(Math.random() * snippets.length)];
-          
-          window.location.href = `index.html?snippet=${encodeURIComponent(randomSnippet.path)}`;
+
+          const randomSnippet =
+            snippets[Math.floor(Math.random() * snippets.length)];
+
+          window.location.href = `index.html?snippet=${encodeURIComponent(
+            randomSnippet.path
+          )}`;
         } catch (error) {
           console.error("Error loading random snippet:", error);
           alert("Could not load random snippet. Please try again.");
         }
-      }
-
-      // =====================================================================
-      // APPLY EXCLUSION CONFIG (PHASE 5.2)
-      // =====================================================================
-
-      function applyExclusionConfig(lineData, preset) {
-        const config = PRESETS[preset];
-
-        const filteredTokens = lineData.display_tokens.map((token) => {
-          let typeable = token.base_typeable;
-
-          if (!typeable) {
-            return { ...token, typeable };
-          }
-
-          if (!token.categories || token.categories.length === 0) {
-            return { ...token, typeable: true };
-          }
-
-          if (
-            config.includeSpecific &&
-            config.includeSpecific.includes(token.text)
-          ) {
-            return { ...token, typeable: true };
-          }
-
-          for (const category of token.categories) {
-            if (config.exclude.includes(category)) {
-              typeable = false;
-              break;
-            }
-          }
-
-          return { ...token, typeable };
-        });
-
-        const typingSequence = filteredTokens
-          .filter((t) => t.typeable)
-          .map((t) => t.text)
-          .join("");
-
-        const charMap = {};
-        let charIdx = 0;
-        const typeableTokens = filteredTokens.filter((t) => t.typeable);
-
-        typeableTokens.forEach((token, tokenIdx) => {
-          for (let i = 0; i < token.text.length; i++) {
-            charMap[String(charIdx)] = {
-              token_idx: tokenIdx,
-              display_col: token.start_col,
-            };
-            charIdx++;
-          }
-        });
-
-        return {
-          ...lineData,
-          display_tokens: filteredTokens,
-          typing_sequence: typingSequence,
-          char_map: charMap,
-        };
       }
 
       // =====================================================================
@@ -747,13 +622,13 @@
 
           currentSnippetInfo.path = fetchPath;
           currentSnippetInfo.language = rawData.language;
-          
-          const pathParts = fetchPath.split('/');
-          const filename = pathParts[pathParts.length - 1].replace('.json', '');
+
+          const pathParts = fetchPath.split("/");
+          const filename = pathParts[pathParts.length - 1].replace(".json", "");
           const lang = pathParts[pathParts.length - 2];
           currentSnippetInfo.id = `${lang}-${filename}`;
 
-          console.log('Loaded snippet:', currentSnippetInfo);
+          console.log("Loaded snippet:", currentSnippetInfo);
 
           const preset = document.querySelector(
             'input[name="typingMode"]:checked'
@@ -774,13 +649,13 @@
         } catch (error) {
           console.error("Error loading file:", error);
           document.getElementById("codeLines").innerHTML = `
-      <div class="text-red-400">
-        Error loading snippet<br>
-        Make sure you're running this from the project root directory.<br>
-        Error: ${error.message}<br><br>
-        <a href="library.html" class="text-blue-400 underline">Go to Library to select a snippet</a>
-      </div>
-    `;
+    <div class="text-red-400">
+      Error loading snippet<br>
+      Make sure you're running this from the project root directory.<br>
+      Error: ${error.message}<br><br>
+      <a href="library.html" class="text-blue-400 underline">Go to Library to select a snippet</a>
+    </div>
+  `;
         }
       }
 
@@ -791,11 +666,11 @@
       function resetTest() {
         testState = {
           active: false,
-          paused: false,              // SESSION 27
+          paused: false, // SESSION 27
           startTime: null,
           endTime: null,
-          pauseStartTime: null,       // SESSION 27
-          totalPausedTime: 0,         // SESSION 27
+          pauseStartTime: null, // SESSION 27
+          totalPausedTime: 0, // SESSION 27
           currentLineIndex: 0,
           currentCharIndex: 0,
           totalCharsTyped: 0,
@@ -846,38 +721,37 @@
 
       function togglePause() {
         if (!testState.active) {
-          console.log('Cannot pause: test not active');
+          console.log("Cannot pause: test not active");
           return;
         }
-        
+
         if (testState.paused) {
           // RESUME
-          console.log('Resuming test');
-          
+          console.log("Resuming test");
+
           const pauseDuration = Date.now() - testState.pauseStartTime;
           testState.totalPausedTime += pauseDuration;
-          
+
           testState.paused = false;
           testState.pauseStartTime = null;
-          
+
           hidePauseOverlay();
           updatePauseButton();
           updateStatus("Typing...", "success");
-          
+
           document.getElementById("codeDisplay").focus();
-          
         } else {
           // PAUSE
-          console.log('Pausing test');
-          
+          console.log("Pausing test");
+
           testState.paused = true;
           testState.pauseStartTime = Date.now();
-          
+
           showPauseOverlay();
           updatePauseButton();
           updateStatus("Paused (Tab to resume)", "warning");
         }
-        
+
         updateStats();
       }
 
@@ -887,25 +761,25 @@
 
       function showPauseOverlay() {
         hidePauseOverlay();
-        
-        const overlay = document.createElement('div');
-        overlay.id = 'pauseOverlay';
-        overlay.className = 'pause-overlay';
+
+        const overlay = document.createElement("div");
+        overlay.id = "pauseOverlay";
+        overlay.className = "pause-overlay";
         overlay.innerHTML = `
-          <div class="pause-content">
-            <div class="pause-icon">⏸️</div>
-            <h2 class="text-3xl font-bold mb-4">Paused</h2>
-            <p class="text-lg mb-2">Press <kbd class="pause-kbd">Tab</kbd> to resume</p>
-            <p class="text-sm text-gray-400 mt-4">or <kbd class="pause-kbd">Esc</kbd> to reset test</p>
-          </div>
-        `;
+      <div class="pause-content">
+        <div class="pause-icon">⸸</div>
+        <h2 class="text-3xl font-bold mb-4">Paused</h2>
+        <p class="text-lg mb-2">Press <kbd class="pause-kbd">Tab</kbd> to resume</p>
+        <p class="text-sm text-gray-400 mt-4">or <kbd class="pause-kbd">Esc</kbd> to reset test</p>
+      </div>
+    `;
         document.body.appendChild(overlay);
-        
-        overlay.addEventListener('click', togglePause);
+
+        overlay.addEventListener("click", togglePause);
       }
 
       function hidePauseOverlay() {
-        const overlay = document.getElementById('pauseOverlay');
+        const overlay = document.getElementById("pauseOverlay");
         if (overlay) {
           overlay.remove();
         }
@@ -916,23 +790,23 @@
       // =====================================================================
 
       function updatePauseButton() {
-        const btn = document.getElementById('pauseBtn');
+        const btn = document.getElementById("pauseBtn");
         if (!btn) return;
-        
+
         if (testState.paused) {
-          btn.textContent = '▶️ Resume';
-          btn.classList.add('paused-state');
+          btn.textContent = "▶️ Resume";
+          btn.classList.add("paused-state");
         } else {
-          btn.textContent = '⏸️ Pause';
-          btn.classList.remove('paused-state');
+          btn.textContent = "⸸ Pause";
+          btn.classList.remove("paused-state");
         }
-        
+
         if (!testState.active) {
           btn.disabled = true;
-          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          btn.classList.add("opacity-50", "cursor-not-allowed");
         } else {
           btn.disabled = false;
-          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+          btn.classList.remove("opacity-50", "cursor-not-allowed");
         }
       }
 
@@ -1048,20 +922,17 @@
           : "0/0";
         let wpm = 0;
         let accuracy = 100;
-        
+
         // SESSION 27: Only calculate WPM when active and not paused
         if (testState.active && testState.startTime && !testState.paused) {
-          const elapsedMinutes = getElapsedTime() / 60;
-          if (elapsedMinutes > 0) {
-            wpm = Math.round(testState.totalCharsTyped / 5 / elapsedMinutes);
-          }
+          const elapsedSeconds = getElapsedTime(testState);
+          wpm = calculateWPM(testState.totalCharsTyped, elapsedSeconds);
         }
-        
+
         if (testState.totalCharsTyped > 0) {
-          accuracy = Math.round(
-            ((testState.totalCharsTyped - testState.totalErrors) /
-              testState.totalCharsTyped) *
-              100
+          accuracy = calculateAccuracy(
+            testState.totalCharsTyped,
+            testState.totalErrors
           );
         }
 
@@ -1071,20 +942,20 @@
         const presetName = PRESETS[preset].name;
 
         document.getElementById("stats").innerHTML = `
-                <div class="grid grid-cols-6 gap-4 text-sm">
-                    <div><div class="text-gray-400">Language</div><div class="font-bold">${
-                      currentData.language
-                    }</div></div>
-                    <div><div class="text-gray-400">Mode</div><div class="font-bold">${presetName}</div></div>
-                    <div><div class="text-gray-400">Line Progress</div><div class="font-bold">${
-                      testState.currentLineIndex + 1
-                    }/${currentData.total_lines}</div></div>
-                    <div><div class="text-gray-400">Char Progress</div><div class="font-bold">${progress}</div></div>
-                    <div><div class="text-gray-400">WPM</div><div class="font-bold">${wpm}</div></div>
-                    <div><div class="text-gray-400">Accuracy</div><div class="font-bold ${
-                      accuracy < 95 ? "text-yellow-400" : "text-green-400"
-                    }">${accuracy}%</div></div>
-                </div>`;
+            <div class="grid grid-cols-6 gap-4 text-sm">
+                <div><div class="text-gray-400">Language</div><div class="font-bold">${
+                  currentData.language
+                }</div></div>
+                <div><div class="text-gray-400">Mode</div><div class="font-bold">${presetName}</div></div>
+                <div><div class="text-gray-400">Line Progress</div><div class="font-bold">${
+                  testState.currentLineIndex + 1
+                }/${currentData.total_lines}</div></div>
+                <div><div class="text-gray-400">Char Progress</div><div class="font-bold">${progress}</div></div>
+                <div><div class="text-gray-400">WPM</div><div class="font-bold">${wpm}</div></div>
+                <div><div class="text-gray-400">Accuracy</div><div class="font-bold ${
+                  accuracy < 95 ? "text-yellow-400" : "text-green-400"
+                }">${accuracy}%</div></div>
+            </div>`;
       }
 
       // =====================================================================
@@ -1110,17 +981,17 @@
         // =====================================================================
         // SESSION 27: TAB KEY FOR PAUSE/RESUME (HANDLE FIRST)
         // =====================================================================
-        
-        if (event.key === 'Tab' && testState.active) {
+
+        if (event.key === "Tab" && testState.active) {
           event.preventDefault();
           togglePause();
           return;
         }
-        
+
         // =====================================================================
         // BLOCK INPUT DURING PAUSE (EXCEPT ESC)
         // =====================================================================
-        
+
         if (testState.paused) {
           if (event.key === "Escape") {
             event.preventDefault();
@@ -1129,11 +1000,11 @@
           }
           return; // Block all other input while paused
         }
-        
+
         // =====================================================================
         // EXISTING SHORTCUTS
         // =====================================================================
-        
+
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (event.key === "Escape") {
           event.preventDefault();
@@ -1265,17 +1136,14 @@
         testState.active = false;
         testState.endTime = Date.now();
         document.body.classList.remove("test-active");
-        
+
         // SESSION 27: Use getElapsedTime() for accurate timing
-        const elapsed = getElapsedTime();
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = Math.floor(elapsed % 60);
-        const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-        const wpm = Math.round(testState.totalCharsTyped / 5 / (elapsed / 60));
-        const accuracy = Math.round(
-          ((testState.totalCharsTyped - testState.totalErrors) /
-            testState.totalCharsTyped) *
-            100
+        const elapsed = getElapsedTime(testState);
+        const timeStr = formatTime(elapsed);
+        const wpm = calculateWPM(testState.totalCharsTyped, elapsed);
+        const accuracy = calculateAccuracy(
+          testState.totalCharsTyped,
+          testState.totalErrors
         );
 
         // SESSION 26: Save stats to localStorage
@@ -1299,49 +1167,49 @@
         overlay.className = "modal-overlay";
         overlay.id = "completionModal";
         overlay.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-title">🎉 Test Complete!</div>
-      <div class="modal-subtitle">Great job on completing the test</div>
-      <div class="modal-stats">
-        <div class="modal-stat">
-          <div class="modal-stat-label">Words Per Minute</div>
-          <div class="modal-stat-value">${wpm}</div>
-        </div>
-        <div class="modal-stat">
-          <div class="modal-stat-label">Accuracy</div>
-          <div class="modal-stat-value">${accuracy}%</div>
-        </div>
-        <div class="modal-stat">
-          <div class="modal-stat-label">Time</div>
-          <div class="modal-stat-value">${timeStr}</div>
-        </div>
+  <div class="modal-content">
+    <div class="modal-title">🎉 Test Complete!</div>
+    <div class="modal-subtitle">Great job on completing the test</div>
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <div class="modal-stat-label">Words Per Minute</div>
+        <div class="modal-stat-value">${wpm}</div>
       </div>
-
-      <div class="modal-buttons">
-        <button class="modal-button modal-button-primary" onclick="retryTest()">
-          🔄 Retry
-        </button>
-        <button
-          class="modal-button modal-button-primary"
-          onclick="loadRandomSnippet()"
-        >
-          🎲 Random Snippet
-        </button>
-        <button
-          class="modal-button modal-button-secondary"
-          onclick="window.location.href='library.html'"
-        >
-          📚 Back to Library
-        </button>
-        <button
-          class="modal-button modal-button-secondary"
-          onclick="closeModal()"
-        >
-          ⚙️ Change Settings
-        </button>
+      <div class="modal-stat">
+        <div class="modal-stat-label">Accuracy</div>
+        <div class="modal-stat-value">${accuracy}%</div>
+      </div>
+      <div class="modal-stat">
+        <div class="modal-stat-label">Time</div>
+        <div class="modal-stat-value">${timeStr}</div>
       </div>
     </div>
-        `;
+
+    <div class="modal-buttons">
+      <button class="modal-button modal-button-primary" onclick="retryTest()">
+        🔄 Retry
+      </button>
+      <button
+        class="modal-button modal-button-primary"
+        onclick="loadRandomSnippet()"
+      >
+        🎲 Random Snippet
+      </button>
+      <button
+        class="modal-button modal-button-secondary"
+        onclick="window.location.href='library.html'"
+      >
+        📚 Back to Library
+      </button>
+      <button
+        class="modal-button modal-button-secondary"
+        onclick="closeModal()"
+      >
+        ⚙️ Change Settings
+      </button>
+    </div>
+  </div>
+      `;
         document.body.appendChild(overlay);
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) closeModal();
@@ -1361,6 +1229,12 @@
         closeModal();
         resetTest();
       }
+
+      // Make functions globally accessible for onclick handlers
+      window.togglePause = togglePause;
+      window.retryTest = retryTest;
+      window.loadRandomSnippet = loadRandomSnippet;
+      window.closeModal = closeModal;
 
       // =====================================================================
       // CSS CLASS HELPER
@@ -1407,73 +1281,30 @@
       }
 
       // =====================================================================
-      // CONFIGURATION & PERSISTENCE (PHASE 5.2)
-      // =====================================================================
-
-      const DEFAULT_CONFIG = {
-        preset: "standard",
-        language: "python",
-      };
-
-      function saveConfig() {
-        const config = {
-          preset: document.querySelector('input[name="typingMode"]:checked')
-            .value,
-          language: document.getElementById("languageSelect").value,
-        };
-        localStorage.setItem("treetype_config", JSON.stringify(config));
-      }
-
-      function loadConfig() {
-        const saved = localStorage.getItem("treetype_config");
-        return saved ? JSON.parse(saved) : DEFAULT_CONFIG;
-      }
-
-      // =====================================================================
       // EVENT LISTENERS (UPDATED FOR PHASE 5.2)
       // =====================================================================
 
-      document
-        .getElementById("languageSelect")
-        .addEventListener("change", (e) => {
-          loadLanguage(e.target.value);
-          saveConfig();
-        });
-
-      document.querySelectorAll('input[name="typingMode"]').forEach((radio) => {
-        radio.addEventListener("change", () => {
-          if (rawData) {
-            const preset = document.querySelector(
-              'input[name="typingMode"]:checked'
-            ).value;
-
-            currentData = {
-              ...rawData,
-              lines: rawData.lines.map((line) =>
-                applyExclusionConfig(line, preset)
-              ),
-            };
-
-            resetTest();
-            saveConfig();
-          }
-        });
-      });
-
-      document.getElementById("resetBtn").addEventListener("click", () => {
-        resetTest();
-      });
-      document.getElementById("codeDisplay").addEventListener("click", () => {
-        document.getElementById("codeDisplay").classList.add("focused");
-      });
-      document.getElementById("codeDisplay").addEventListener("blur", () => {
-        document.getElementById("codeDisplay").classList.remove("focused");
-      });
+      // Global keydown listener (can be attached immediately)
       document.addEventListener("keydown", handleKeyPress);
 
+      // Wait for DOM to be ready before attaching element-specific listeners
       document.addEventListener("DOMContentLoaded", () => {
+        // Load saved config
         const config = loadConfig();
 
+        // Set up language selector
+        const languageSelect = document.getElementById("languageSelect");
+        languageSelect.value = config.language;
+        languageSelect.addEventListener("change", (e) => {
+          loadLanguage(e.target.value);
+          saveConfig({
+            preset: document.querySelector('input[name="typingMode"]:checked')
+              .value,
+            language: e.target.value,
+          });
+        });
+
+        // Set up typing mode radios
         const presetRadio = document.querySelector(
           `input[name="typingMode"][value="${config.preset}"]`
         );
@@ -1481,10 +1312,48 @@
           presetRadio.checked = true;
         }
 
-        document.getElementById("languageSelect").value = config.language;
+        document
+          .querySelectorAll('input[name="typingMode"]')
+          .forEach((radio) => {
+            radio.addEventListener("change", () => {
+              if (rawData) {
+                const preset = document.querySelector(
+                  'input[name="typingMode"]:checked'
+                ).value;
 
+                currentData = {
+                  ...rawData,
+                  lines: rawData.lines.map((line) =>
+                    applyExclusionConfig(line, preset)
+                  ),
+                };
+
+                resetTest();
+                saveConfig({
+                  preset: preset,
+                  language: document.getElementById("languageSelect").value,
+                });
+              }
+            });
+          });
+
+        // Set up reset button
+        document.getElementById("resetBtn").addEventListener("click", () => {
+          resetTest();
+        });
+
+        // Set up code display focus handlers
+        const codeDisplay = document.getElementById("codeDisplay");
+        codeDisplay.addEventListener("click", () => {
+          codeDisplay.classList.add("focused");
+        });
+        codeDisplay.addEventListener("blur", () => {
+          codeDisplay.classList.remove("focused");
+        });
+
+        // Load initial language and focus
         loadLanguage(config.language);
-        document.getElementById("codeDisplay").focus();
+        codeDisplay.focus();
       });
     </script>
   </body>
