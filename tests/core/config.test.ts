@@ -88,8 +88,8 @@ describe("Config: Token Filtering Logic", () => {
     });
   });
 
-  describe("JSX Tag Name Handling - THE CRITICAL BUG", () => {
-    test("MINIMAL MODE: JSX tag names should be excluded (currently FAILING)", () => {
+  describe("JSX Tag Name Handling", () => {
+    test("MINIMAL MODE: JSX tag names should be excluded", () => {
       // Line 18: if (loading) return <p>Loading item...</p>;
       const line = createTestLine([
         {
@@ -153,7 +153,7 @@ describe("Config: Token Filtering Logic", () => {
           base_typeable: true,
           start_col: 20,
           end_col: 21,
-          categories: [], // ← NO CATEGORY! This is the problem
+          categories: [],
         },
         {
           text: ">",
@@ -189,7 +189,7 @@ describe("Config: Token Filtering Logic", () => {
           base_typeable: true,
           start_col: 39,
           end_col: 40,
-          categories: [], // ← NO CATEGORY! This is the problem
+          categories: [],
         },
         {
           text: ">",
@@ -213,31 +213,12 @@ describe("Config: Token Filtering Logic", () => {
 
       const result = applyExclusionConfig(line, "minimal");
 
-      // EXPECTED BEHAVIOR:
-      // - Angle brackets excluded ✓
-      // - JSX tag names ("p") should be excluded ✗ (currently failing)
-      // - JSX text content included ✓
-      // - Keywords included ✓
-      // - Regular identifiers included ✓
-
-      expect(result.display_tokens[5].typeable).toBe(false); // <
-      expect(result.display_tokens[6].typeable).toBe(false); // p ← SHOULD BE FALSE
-      expect(result.display_tokens[7].typeable).toBe(false); // >
-      expect(result.display_tokens[8].typeable).toBe(true); // Loading item...
-      expect(result.display_tokens[9].typeable).toBe(false); // </
-      expect(result.display_tokens[10].typeable).toBe(false); // p ← SHOULD BE FALSE
-      expect(result.display_tokens[11].typeable).toBe(false); // >
-
-      // Expected typing sequence (without 'p' tags)
+      expect(result.display_tokens[6].typeable).toBe(false); // p
+      expect(result.display_tokens[10].typeable).toBe(false); // p
       expect(result.typing_sequence).toBe("ifloadingreturnLoading item...");
-
-      // NOT the current broken sequence:
-      expect(result.typing_sequence).not.toBe(
-        "ifloadingreturnpLoading item...p"
-      );
     });
 
-    test("STANDARD MODE: JSX tag names should be excluded (currently FAILING)", () => {
+    test("STANDARD MODE: JSX tag names should be excluded", () => {
       const line = createTestLine([
         {
           text: "<",
@@ -306,16 +287,9 @@ describe("Config: Token Filtering Logic", () => {
 
       const result = applyExclusionConfig(line, "standard");
 
-      expect(result.display_tokens[0].typeable).toBe(false); // <
-      expect(result.display_tokens[1].typeable).toBe(false); // div ← SHOULD BE FALSE
-      expect(result.display_tokens[2].typeable).toBe(false); // >
-      expect(result.display_tokens[3].typeable).toBe(true); // Hello
-      expect(result.display_tokens[4].typeable).toBe(false); // </
-      expect(result.display_tokens[5].typeable).toBe(false); // div ← SHOULD BE FALSE
-      expect(result.display_tokens[6].typeable).toBe(false); // >
-
+      expect(result.display_tokens[1].typeable).toBe(false); // div
+      expect(result.display_tokens[5].typeable).toBe(false); // div
       expect(result.typing_sequence).toBe("Hello");
-      expect(result.typing_sequence).not.toBe("divHellodiv");
     });
 
     test("FULL MODE: JSX tag names SHOULD be included", () => {
@@ -386,22 +360,10 @@ describe("Config: Token Filtering Logic", () => {
       ]);
 
       const result = applyExclusionConfig(line, "full");
-
-      // In FULL mode, everything is typeable (except comments)
-      expect(result.display_tokens[0].typeable).toBe(true); // <
-      expect(result.display_tokens[1].typeable).toBe(true); // span
-      expect(result.display_tokens[2].typeable).toBe(true); // >
-      expect(result.display_tokens[3].typeable).toBe(true); // Text
-      expect(result.display_tokens[4].typeable).toBe(true); // </
-      expect(result.display_tokens[5].typeable).toBe(true); // span
-      expect(result.display_tokens[6].typeable).toBe(true); // >
-
       expect(result.typing_sequence).toBe("<span>Text</span>");
     });
 
     test("Complex JSX: multiple tags and attributes", () => {
-      console.log("\n=== COMPLEX JSX TEST START ===");
-      
       const line = createTestLine([
         {
           text: "<",
@@ -513,36 +475,11 @@ describe("Config: Token Filtering Logic", () => {
         },
       ]);
 
-      console.log("Input tokens:");
-      line.display_tokens.forEach((token, idx) => {
-        console.log(`  [${idx}] "${token.text}" | type: ${token.type} | prev: "${line.display_tokens[idx-1]?.text || 'none'}" | next: "${line.display_tokens[idx+1]?.text || 'none'}"`);
-      });
-
       const result = applyExclusionConfig(line, "minimal");
 
-      console.log("\nAfter filtering:");
-      result.display_tokens.forEach((token, idx) => {
-        console.log(`  [${idx}] "${token.text}" | typeable: ${token.typeable}`);
-      });
-      console.log(`\nTyping sequence: "${result.typing_sequence}"`);
-      console.log("=== COMPLEX JSX TEST END ===\n");
-
-      // Tag names should be excluded in minimal mode
       expect(result.display_tokens[1].typeable).toBe(false); // button (opening)
       expect(result.display_tokens[10].typeable).toBe(false); // button (closing)
-
-      // Regular identifiers (onClick, handleClick) should be included
-      expect(result.display_tokens[2].typeable).toBe(true); // onClick
-      expect(result.display_tokens[5].typeable).toBe(true); // handleClick
-
-      // JSX text should be included
-      expect(result.display_tokens[8].typeable).toBe(true); // Click
-
-      // Should NOT have tag names in sequence
-      expect(result.typing_sequence).not.toContain("button");
-      expect(result.typing_sequence).toContain("onClick");
-      expect(result.typing_sequence).toContain("handleClick");
-      expect(result.typing_sequence).toContain("Click");
+      expect(result.typing_sequence).toBe("onClickhandleClickClick");
     });
   });
 
