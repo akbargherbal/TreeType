@@ -490,35 +490,45 @@ export class TreeTypeApp {
     overlay.className = "modal-overlay";
     overlay.id = "completionModal";
     overlay.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-title">🎉 Test Complete!</div>
-        <div class="modal-subtitle">Great job on completing the test</div>
-        <div class="modal-stats">
-          <div class="modal-stat">
-            <div class="modal-stat-label">Words Per Minute</div>
-            <div class="modal-stat-value">${wpm}</div>
+      <div class="modal-content p-8 gap-5" style="max-width: 525px">
+        <!-- Header -->
+        <div>
+          <h2 class="text-4xl font-bold">🎉 Test Complete!</h2>
+          <p class="text-lg text-gray-400 mt-2">Great job on completing the test</p>
+        </div>
+
+        <!-- Stats (Integrated Grid) -->
+        <div class="grid grid-cols-3 gap-4 py-3 text-center">
+          <div>
+            <p class="text-base text-gray-400 uppercase tracking-wider">WPM</p>
+            <p class="text-5xl font-bold text-green-400">${wpm}</p>
           </div>
-          <div class="modal-stat">
-            <div class="modal-stat-label">Accuracy</div>
-            <div class="modal-stat-value">${accuracy}%</div>
+          <div>
+            <p class="text-base text-gray-400 uppercase tracking-wider">Accuracy</p>
+            <p class="text-5xl font-bold text-green-400">${accuracy}%</p>
           </div>
-          <div class="modal-stat">
-            <div class="modal-stat-label">Time</div>
-            <div class="modal-stat-value">${timeStr}</div>
+          <div>
+            <p class="text-base text-gray-400 uppercase tracking-wider">Time</p>
+            <p class="text-5xl font-bold text-green-400">${timeStr}</p>
           </div>
         </div>
-        <div class="modal-buttons">
-          <button class="modal-button modal-button-primary" id="retryBtn">
-            🔄 Retry
+
+        <!-- Divider -->
+        <hr class="border-gray-600" />
+
+        <!-- Buttons (2x2 Grid for equal sizing) -->
+        <div class="grid grid-cols-2 gap-4">
+          <button id="retryBtn" class="modal-button modal-button-primary text-lg py-4 px-5">
+            <span>🔄</span> Retry
           </button>
-          <button class="modal-button modal-button-primary" id="randomBtn">
-            🎲 Random Snippet
+          <button id="randomBtn" class="modal-button modal-button-primary text-lg py-4 px-5">
+            <span>🎲</span> Random
           </button>
-          <button class="modal-button modal-button-secondary" id="libraryBtn">
-            📚 Back to Library
+          <button id="libraryBtn" class="modal-button modal-button-secondary text-lg py-4 px-5">
+            <span>📚</span> Library
           </button>
-          <button class="modal-button modal-button-secondary" id="settingsBtn">
-            ⚙️ Change Settings
+          <button id="settingsBtn" class="modal-button modal-button-secondary text-lg py-4 px-5">
+            <span>⚙️</span> Settings
           </button>
         </div>
       </div>
