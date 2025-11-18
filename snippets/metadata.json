@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "generatedAt": "2025-11-16T07:58:53.815547Z",
-  "totalSnippets": 98,
+  "generatedAt": "2025-11-17T18:01:53.547282Z",
+  "totalSnippets": 99,
   "languages": [
     "javascript",
     "python",
@@ -9,6 +9,20 @@
     "typescript"
   ],
   "snippets": [
+    {
+      "id": "javascript-00_01_firebase",
+      "name": "00 01 Firebase",
+      "language": "javascript",
+      "path": "snippets/javascript/00_01_firebase.json",
+      "lines": 113,
+      "typeable_chars": 4701,
+      "difficulty": "advanced",
+      "tags": [
+        "javascript",
+        "firebase"
+      ],
+      "dateAdded": "2025-11-17"
+    },
     {
       "id": "javascript-gm_01_001_01_array-methods",
       "name": "Gm 01 001 01 Array-methods",
@@ -23,7 +37,7 @@
         "array",
         "methods"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_001_02_array-methods",
@@ -39,7 +53,7 @@
         "array",
         "methods"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_002_01_async-patterns",
@@ -55,7 +69,7 @@
         "async",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_002_02_async-patterns",
@@ -71,7 +85,7 @@
         "async",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_003_01_common-utilities",
@@ -87,7 +101,7 @@
         "common",
         "utilities"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_003_02_common-utilities",
@@ -103,7 +117,7 @@
         "common",
         "utilities"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_005_01_dom-manipulation",
@@ -119,7 +133,7 @@
         "dom",
         "manipulation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_005_02_dom-manipulation",
@@ -135,7 +149,7 @@
         "dom",
         "manipulation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_006_01_es6-class-syntax",
@@ -152,7 +166,7 @@
         "class",
         "syntax"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_006_02_es6-class-syntax",
@@ -169,7 +183,7 @@
         "class",
         "syntax"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_007_01_error-handling",
@@ -185,7 +199,7 @@
         "error",
         "handling"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_007_02_error-handling",
@@ -201,7 +215,7 @@
         "error",
         "handling"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_008_01_functional-programming-patterns",
@@ -218,7 +232,7 @@
         "programming",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_008_02_functional-programming-patterns",
@@ -235,7 +249,7 @@
         "programming",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_009_01_json-operations",
@@ -251,7 +265,7 @@
         "json",
         "operations"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_009_02_json-operations",
@@ -267,7 +281,7 @@
         "json",
         "operations"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_010_01_modern-javascript-patterns",
@@ -283,7 +297,7 @@
         "modern",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_010_02_modern-javascript-patterns",
@@ -299,7 +313,7 @@
         "modern",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_011_01_module-patterns",
@@ -315,7 +329,7 @@
         "module",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_011_02_module-patterns",
@@ -331,7 +345,7 @@
         "module",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_012_01_object-manipulation",
@@ -347,7 +361,7 @@
         "object",
         "manipulation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_012_02_object-manipulation",
@@ -363,7 +377,7 @@
         "object",
         "manipulation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_013_01_string-methods",
@@ -379,7 +393,7 @@
         "string",
         "methods"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "javascript-gm_01_013_02_string-methods",
@@ -395,7 +409,7 @@
         "string",
         "methods"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_001_02_03_core-python-patterns-quick-refresh",
@@ -412,7 +426,7 @@
         "patterns",
         "quick"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_002_02_03_decorators-level-up",
@@ -428,7 +442,7 @@
         "decorators",
         "level"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_003_02_03_oop-patterns-intermediate-to-advanced",
@@ -445,7 +459,7 @@
         "patterns",
         "intermediate"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_004_02_03_flask-patterns-c-level-b-level",
@@ -462,7 +476,7 @@
         "patterns",
         "level"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_005_02_03_django-patterns-d-level-c-level",
@@ -479,7 +493,7 @@
         "patterns",
         "level"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_006_02_03_fastapi-patterns-d-level-c-level",
@@ -496,7 +510,7 @@
         "patterns",
         "level"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_007_02_03_pandas-patterns-ba-level-refinement",
@@ -513,7 +527,7 @@
         "patterns",
         "level"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_008_02_03_context-managers",
@@ -529,7 +543,7 @@
         "context",
         "managers"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_009_02_03_async-python-patterns",
@@ -545,7 +559,7 @@
         "async",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_010_02_03_error-handling-patterns",
@@ -562,7 +576,7 @@
         "handling",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_011_02_03_file-and-path-operations",
@@ -579,7 +593,7 @@
         "and",
         "path"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_012_02_03_testing-patterns-pytest",
@@ -596,7 +610,7 @@
         "patterns",
         "pytest"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_013_02_03_type-hints-modern-python",
@@ -613,7 +627,7 @@
         "hints",
         "modern"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_014_02_03_itertools-patterns",
@@ -629,7 +643,7 @@
         "itertools",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_015_02_03_functools-patterns",
@@ -645,7 +659,7 @@
         "functools",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_016_02_03_collections-module",
@@ -661,7 +675,7 @@
         "collections",
         "module"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_017_02_03_http-requests-requests-library",
@@ -678,7 +692,7 @@
         "requests",
         "library"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_018_02_03_environment-and-config",
@@ -695,7 +709,7 @@
         "and",
         "config"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_019_02_03_logging-patterns",
@@ -711,7 +725,7 @@
         "logging",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_020_02_03_database-patterns-sqlalchemy-basics",
@@ -728,7 +742,7 @@
         "patterns",
         "sqlalchemy"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_021_02_03_string-and-regex-patterns",
@@ -745,7 +759,7 @@
         "and",
         "regex"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_022_02_03_date-and-time-patterns",
@@ -762,7 +776,7 @@
         "and",
         "time"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_023_02_03_performance-patterns",
@@ -778,7 +792,7 @@
         "performance",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_024_02_03_cli-patterns-argparse",
@@ -795,7 +809,7 @@
         "patterns",
         "argparse"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_025_02_03_data-validation-pydantic",
@@ -812,7 +826,7 @@
         "validation",
         "pydantic"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_026_02_03_metaclasses-and-advanced-oop",
@@ -829,7 +843,7 @@
         "and",
         "advanced"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_027_02_03_csv-and-excel-processing",
@@ -846,7 +860,7 @@
         "and",
         "excel"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_028_02_03_web-scraping-essentials",
@@ -863,7 +877,7 @@
         "scraping",
         "essentials"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_029_02_03_multiprocessingthreading",
@@ -878,7 +892,7 @@
         "029",
         "multiprocessingthreading"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_030_02_03_gcp-specific-python-patterns",
@@ -895,7 +909,7 @@
         "specific",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_031_02_03_api-design-patterns",
@@ -912,7 +926,7 @@
         "design",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_032_02_03_common-automation-patterns",
@@ -929,7 +943,7 @@
         "automation",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "python-gm_01_033_02_03_python-best-practices-patterns",
@@ -946,7 +960,7 @@
         "practices",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_014_01_async-patterns",
@@ -954,7 +968,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_014_01_async-patterns.json",
       "lines": 52,
-      "typeable_chars": 1256,
+      "typeable_chars": 1255,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -962,7 +976,7 @@
         "async",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_014_02_async-patterns",
@@ -970,7 +984,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_014_02_async-patterns.json",
       "lines": 52,
-      "typeable_chars": 1256,
+      "typeable_chars": 1255,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -978,7 +992,7 @@
         "async",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_015_01_common-ui-patterns",
@@ -986,7 +1000,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_015_01_common-ui-patterns.json",
       "lines": 87,
-      "typeable_chars": 2443,
+      "typeable_chars": 2406,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -994,7 +1008,7 @@
         "common",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_015_02_common-ui-patterns",
@@ -1002,7 +1016,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_015_02_common-ui-patterns.json",
       "lines": 90,
-      "typeable_chars": 2601,
+      "typeable_chars": 2590,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1010,7 +1024,7 @@
         "common",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_016_01_context-api",
@@ -1018,7 +1032,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_016_01_context-api.json",
       "lines": 33,
-      "typeable_chars": 808,
+      "typeable_chars": 806,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1026,7 +1040,7 @@
         "context",
         "api"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_016_02_context-api",
@@ -1034,7 +1048,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_016_02_context-api.json",
       "lines": 33,
-      "typeable_chars": 808,
+      "typeable_chars": 806,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1042,7 +1056,7 @@
         "context",
         "api"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_018_01_data-transformation-patterns",
@@ -1050,7 +1064,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_018_01_data-transformation-patterns.json",
       "lines": 100,
-      "typeable_chars": 2333,
+      "typeable_chars": 2326,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1059,7 +1073,7 @@
         "transformation",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_018_02_data-transformation-patterns",
@@ -1067,7 +1081,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_018_02_data-transformation-patterns.json",
       "lines": 100,
-      "typeable_chars": 2333,
+      "typeable_chars": 2326,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1076,7 +1090,7 @@
         "transformation",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_019_01_integration-patterns",
@@ -1084,7 +1098,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_019_01_integration-patterns.json",
       "lines": 67,
-      "typeable_chars": 1984,
+      "typeable_chars": 1983,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1092,7 +1106,7 @@
         "integration",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_019_02_integration-patterns",
@@ -1100,7 +1114,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_019_02_integration-patterns.json",
       "lines": 66,
-      "typeable_chars": 1430,
+      "typeable_chars": 1417,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1108,7 +1122,7 @@
         "integration",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_020_01_performance-patterns",
@@ -1116,7 +1130,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_020_01_performance-patterns.json",
       "lines": 61,
-      "typeable_chars": 1692,
+      "typeable_chars": 1689,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1124,7 +1138,7 @@
         "performance",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_020_02_performance-patterns",
@@ -1132,7 +1146,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_020_02_performance-patterns.json",
       "lines": 61,
-      "typeable_chars": 1692,
+      "typeable_chars": 1689,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1140,7 +1154,7 @@
         "performance",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_021_01_react-hook-form-form-handling",
@@ -1148,7 +1162,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_021_01_react-hook-form-form-handling.json",
       "lines": 105,
-      "typeable_chars": 2860,
+      "typeable_chars": 2859,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1157,7 +1171,7 @@
         "hook",
         "form"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_021_02_react-hook-form-form-handling",
@@ -1165,7 +1179,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_021_02_react-hook-form-form-handling.json",
       "lines": 110,
-      "typeable_chars": 2827,
+      "typeable_chars": 2826,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1174,7 +1188,7 @@
         "hook",
         "form"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_022_01_react-router-navigation",
@@ -1182,7 +1196,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_022_01_react-router-navigation.json",
       "lines": 114,
-      "typeable_chars": 3041,
+      "typeable_chars": 3035,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1191,7 +1205,7 @@
         "router",
         "navigation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_022_02_react-router-navigation",
@@ -1199,7 +1213,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_022_02_react-router-navigation.json",
       "lines": 114,
-      "typeable_chars": 3041,
+      "typeable_chars": 3035,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1208,7 +1222,7 @@
         "router",
         "navigation"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_023_01_tanstack-query-react-query-data-fetching",
@@ -1216,7 +1230,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_023_01_tanstack-query-react-query-data-fetching.json",
       "lines": 126,
-      "typeable_chars": 3569,
+      "typeable_chars": 3551,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1225,7 +1239,7 @@
         "query",
         "react"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_023_02_tanstack-query-react-query-data-fetching",
@@ -1233,7 +1247,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_023_02_tanstack-query-react-query-data-fetching.json",
       "lines": 146,
-      "typeable_chars": 4124,
+      "typeable_chars": 4105,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1242,7 +1256,7 @@
         "query",
         "react"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_024_01_typescript-patterns",
@@ -1250,7 +1264,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_024_01_typescript-patterns.json",
       "lines": 43,
-      "typeable_chars": 934,
+      "typeable_chars": 931,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1258,7 +1272,7 @@
         "typescript",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_024_02_typescript-patterns",
@@ -1266,7 +1280,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_024_02_typescript-patterns.json",
       "lines": 43,
-      "typeable_chars": 934,
+      "typeable_chars": 931,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1274,7 +1288,7 @@
         "typescript",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_025_01_zustand-state-management",
@@ -1282,7 +1296,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_025_01_zustand-state-management.json",
       "lines": 62,
-      "typeable_chars": 1638,
+      "typeable_chars": 1637,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1291,7 +1305,7 @@
         "state",
         "management"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "tsx-gm_01_025_02_zustand-state-management",
@@ -1299,7 +1313,7 @@
       "language": "tsx",
       "path": "snippets/tsx/gm_01_025_02_zustand-state-management.json",
       "lines": 62,
-      "typeable_chars": 1638,
+      "typeable_chars": 1637,
       "difficulty": "advanced",
       "tags": [
         "tsx",
@@ -1308,7 +1322,7 @@
         "state",
         "management"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_026_01_apidata-patterns",
@@ -1324,7 +1338,7 @@
         "apidata",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_026_02_apidata-patterns",
@@ -1340,7 +1354,7 @@
         "apidata",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_027_02_advanced-types",
@@ -1356,7 +1370,7 @@
         "advanced",
         "types"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_028_01_basic-type-annotations",
@@ -1373,7 +1387,7 @@
         "type",
         "annotations"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_028_02_basic-type-annotations",
@@ -1390,7 +1404,7 @@
         "type",
         "annotations"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_029_01_class-patterns-typescript-specific",
@@ -1407,7 +1421,7 @@
         "patterns",
         "specific"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_029_02_class-patterns-typescript-specific",
@@ -1424,7 +1438,7 @@
         "patterns",
         "specific"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_030_01_common-gotchas-to-practice",
@@ -1441,7 +1455,7 @@
         "gotchas",
         "practice"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_030_02_common-gotchas-to-practice",
@@ -1458,7 +1472,7 @@
         "gotchas",
         "practice"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_031_01_configuration-patterns",
@@ -1474,7 +1488,7 @@
         "configuration",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_031_02_configuration-patterns",
@@ -1490,7 +1504,7 @@
         "configuration",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_032_01_error-handling-with-types",
@@ -1507,7 +1521,7 @@
         "handling",
         "with"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_032_02_error-handling-with-types",
@@ -1524,7 +1538,7 @@
         "handling",
         "with"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_033_01_function-patterns",
@@ -1540,7 +1554,7 @@
         "function",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_033_02_function-patterns",
@@ -1556,7 +1570,7 @@
         "function",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_034_01_interface-patterns",
@@ -1572,7 +1586,7 @@
         "interface",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_034_02_interface-patterns",
@@ -1588,7 +1602,7 @@
         "interface",
         "patterns"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_036_01_react-specific-typescript",
@@ -1604,7 +1618,7 @@
         "react",
         "specific"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     },
     {
       "id": "typescript-gm_01_036_02_react-specific-typescript",
@@ -1620,7 +1634,7 @@
         "react",
         "specific"
       ],
-      "dateAdded": "2025-11-16"
+      "dateAdded": "2025-11-17"
     }
   ]
 }

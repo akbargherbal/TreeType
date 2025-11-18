@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:prod": "pnpm run type-check && pnpm run test && vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist",
+    "rebuild": "pnpm run clean && pnpm run build:prod"
   },
   "keywords": [
     "typing",

@@ -6,17 +6,40 @@ export default defineConfig({
   root: '.',
   build: {
     outDir: 'dist',
+    // Production optimizations
+    minify: 'terser', // Best compression
+    sourcemap: true, // For debugging production issues
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        library: resolve(__dirname, 'library.html'), // ← Added!
+      },
+      output: {
+        // Manual chunking for better caching
+        manualChunks: {
+          'timer': ['./src/core/timer.ts'],
+          'config': ['./src/core/config.ts'],
+          'storage': ['./src/core/storage.ts'],
+        },
       },
     },
+    // Terser options for production
+    terserOptions: {
+      compress: {
+        drop_console: false, // Keep console.log (personal use)
+        drop_debugger: true, // Remove debugger statements
+      },
+    },
+    // Report compressed size
+    reportCompressedSize: true,
+    // Chunk size warning limit (500 kB)
+    chunkSizeWarningLimit: 500,
   },
   server: {
     port: 3000,
     open: true,
   },
-  
+
   // Test configuration
   test: {
     globals: true,
