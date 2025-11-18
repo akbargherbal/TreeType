@@ -1,3 +1,4 @@
+<!-- HISTORICAL DOCUMENT - INCEPTION OF THE PROJECT -->
 # Context Document: Tree-Sitter Exploratory Analysis Project
 
 ## Project Intent
