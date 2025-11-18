@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
 
 export default defineConfig({
+  base: '/treetype/', // ← CRITICAL: Base path for GitHub Pages!
+  
   // App serving configuration
   root: '.',
   build: {
@@ -12,7 +14,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        library: resolve(__dirname, 'library.html'), // ← Added!
+        library: resolve(__dirname, 'library.html'),
       },
       output: {
         // Manual chunking for better caching
