@@ -1,1119 +1,685 @@
-# From `pnpm dev` to Production: A Complete Guide
+# Manual Deployment to GitHub Pages: A Practical Guide
 
-**A beginner's guide to understanding development vs. production, builds, and deployment**
-
----
-
-## 🎯 Part 1: What You've Been Doing - Development Mode
-
-### The `pnpm dev` Experience
-
-When you run `pnpm dev`, here's what happens:
-
-```bash
-pnpm dev
-# Output: VITE v7.2.2  ready in 234 ms
-#         ➜  Local:   http://localhost:3000/
-```
-
-**Behind the scenes:**
-
-1. **Vite starts a development server** on your machine (localhost:3000)
-2. **Your TypeScript files stay as TypeScript** - not compiled to JavaScript yet
-3. **Vite transforms code in real-time** as you request it in the browser
-4. **Hot Module Replacement (HMR)** - changes appear instantly without refresh
-5. **Source maps** - errors show line numbers from your actual .ts files
-
-**The magic:** When you edit `src/app.ts`:
-
-```
-You save file
-    ↓
-Vite detects change (in milliseconds)
-    ↓
-Vite transforms only that file
-    ↓
-Browser receives update
-    ↓
-Page updates WITHOUT full reload
-    ↓
-Your state is preserved!
-```
-
-**Why it's fast:** Vite doesn't bundle everything upfront. It serves files on-demand using native ES modules.
-
-### The Development Workflow
-
-```
-┌─────────────────────────────────────────────┐
-│  Your Machine (Development)                 │
-│                                             │
-│  src/app.ts  ──→  Vite Dev Server  ──→  Browser │
-│  (TypeScript)     (localhost:3000)     (You)    │
-│                                             │
-│  • Real-time transforms                     │
-│  • Detailed error messages                  │
-│  • Source maps (see original code)          │
-│  • No optimization (speed over size)        │
-└─────────────────────────────────────────────┘
-```
-
-**Perfect for:**
-
-- ✅ Writing code
-- ✅ Testing features
-- ✅ Debugging
-- ✅ Rapid iteration
-
-**Not suitable for:**
-
-- ❌ Sharing with others (only runs on your machine)
-- ❌ Production use (slow, large files, debug code included)
-- ❌ Mobile testing (localhost not accessible from phone)
+**Based on real experience deploying TreeType - including what went wrong and how we fixed it**
 
 ---
 
-## 🏭 Part 2: Production - What Changes and Why
+## 🎯 What You'll Learn
 
-### The Core Problem
+This guide covers deploying a Vite-based TypeScript project to GitHub Pages, focusing on:
 
-**You can't share `localhost:3000` with the world.**
-
-Your development server only exists on your computer. To share your app, you need to:
-
-1. **Transform** TypeScript → JavaScript (browsers can't run TypeScript)
-2. **Bundle** hundreds of small files → a few optimized files
-3. **Minify** remove whitespace, shorten variable names, compress
-4. **Host** put files on a public server
-
-### What is a "Production Build"?
-
-Running `pnpm build` creates a **production build** - a folder of static files ready to deploy.
-
-**Before build (your source):**
-
-```
-src/
-├── app.ts                  (15 KB, readable TypeScript)
-├── core/
-│   ├── timer.ts           (8 KB)
-│   ├── config.ts          (12 KB)
-│   └── storage.ts         (5 KB)
-├── ui/
-│   ├── renderer.ts        (20 KB)
-│   └── keyboard.ts        (10 KB)
-└── types/
-    ├── state.ts           (3 KB)
-    └── snippet.ts         (4 KB)
-
-Total: ~77 KB of TypeScript across 8 files
-```
-
-**After build (production output):**
-
-```
-dist/
-├── index.html             (12 KB)
-├── library.html           (7 KB)
-└── assets/
-    ├── main-CxGLzXHt.js   (17 KB) ← All your code, compiled & minified
-    ├── library-DrxzngBr.js (5 KB)
-    └── storage-C9m-g7-x.js (1 KB)
-
-Total: ~42 KB (with gzip: ~12 KB!)
-```
-
-### What Happens During `pnpm build`?
-
-Let's break down each step:
-
-#### Step 1: TypeScript Compilation (`tsc`)
-
-```bash
-# First, TypeScript checks types and compiles
-tsc
-```
-
-**What happens:**
-
-- Reads `tsconfig.json` for rules
-- Checks all `.ts` files for type errors
-- If errors found → **build stops** (catches bugs!)
-- Compiles `.ts` → `.js` (but doesn't bundle yet)
-
-**Example transformation:**
-
-```typescript
-// Before (src/core/timer.ts)
-export function calculateWPM(chars: number, seconds: number): number {
-  if (seconds <= 0) return 0;
-  const minutes = seconds / 60;
-  return Math.round(chars / 5 / minutes);
-}
-```
-
-```javascript
-// After (TypeScript compilation)
-export function calculateWPM(chars, seconds) {
-  if (seconds <= 0) return 0;
-  const minutes = seconds / 60;
-  return Math.round(chars / 5 / minutes);
-}
-```
-
-**Notice:** Types are removed, but code is still readable.
-
-#### Step 2: Vite Bundling & Optimization
-
-```bash
-# Then, Vite bundles everything
-vite build
-```
-
-**What Vite does:**
-
-**2a. Module Resolution**
-
-- Finds all `import` statements
-- Traces dependencies (e.g., `app.ts` imports `timer.ts`)
-- Creates a dependency graph
-
-**2b. Tree Shaking**
-
-- Removes unused code
-- Example: If you import `calculateWPM` but not `calculateAccuracy`, only `calculateWPM` is included
-
-**2c. Minification (Terser)**
-
-```javascript
-// Before minification (readable)
-export function calculateWPM(chars, seconds) {
-  if (seconds <= 0) return 0;
-  const minutes = seconds / 60;
-  return Math.round(chars / 5 / minutes);
-}
-
-// After minification (compressed)
-export function calculateWPM(e, t) {
-  return t <= 0 ? 0 : Math.round(e / 5 / (t / 60));
-}
-```
-
-**Changes:**
-
-- `chars` → `e` (shorter variable name)
-- `seconds` → `t`
-- Removed whitespace
-- Used ternary operator (`?:`) instead of `if`
-- Inlined `minutes` calculation
-
-**2d. Code Splitting**
-
-- Separates code into chunks
-- `main-[hash].js` - main app
-- `library-[hash].js` - library page
-- `storage-[hash].js` - shared utilities
-
-**Why?** Browser caches these separately. If you update main app, browser only re-downloads that file, not the storage utilities.
-
-**2e. Asset Optimization**
-
-- Adds cache-busting hashes (`main-CxGLzXHt.js`)
-- Generates source maps (for debugging production)
-- Compresses with gzip
-
-#### Step 3: Output to `dist/`
-
-Final structure:
-
-```
-dist/
-├── index.html              ← Entry point
-├── library.html            ← Library entry point
-└── assets/
-    ├── main-CxGLzXHt.js    ← Your app (compiled, minified)
-    ├── library-DrxzngBr.js
-    └── storage-C9m-g7-x.js
-```
-
-**Key insight:** The `dist/` folder is **completely self-contained**. It doesn't need Node.js, pnpm, or any build tools. Just a web server!
-
-### Testing the Production Build Locally
-
-```bash
-# Build
-pnpm build
-
-# Preview (serves dist/ folder)
-pnpm preview
-# Output: http://localhost:4173
-```
-
-**What's different from `pnpm dev`?**
-
-| Aspect  | `pnpm dev`                 | `pnpm preview`             |
-| ------- | -------------------------- | -------------------------- |
-| Source  | TypeScript files           | JavaScript bundles         |
-| Speed   | Instant updates            | No updates (static)        |
-| Size    | ~77 KB (unoptimized)       | ~12 KB (gzipped)           |
-| Errors  | Detailed with line numbers | Minified (harder to debug) |
-| Purpose | Development                | Testing production build   |
+- The **critical base path configuration** (the #1 mistake)
+- A battle-tested deployment script
+- Manual deployment workflow
+- Troubleshooting common issues
 
 ---
 
-## 🌐 Part 3: Deployment - Sharing Your App
+## Part 1: Understanding the Basics
 
-### What is Deployment?
+### Development vs Production
 
-**Deployment** = Making your `dist/` folder accessible on the internet.
+**Development** (`pnpm dev`):
 
-### Deployment Options
+- Runs only on your machine (localhost:3000)
+- TypeScript files served directly
+- Hot Module Replacement (instant updates)
+- Detailed error messages
+- Large, unoptimized files
 
-#### Option A: Static File Hosting (What We're Using)
+**Production** (after `pnpm build`):
 
-**Examples:** GitHub Pages, Netlify, Vercel, Cloudflare Pages
-
-**How it works:**
-
-1. Upload your `dist/` folder to their servers
-2. They assign you a URL (e.g., `https://username.github.io/treetype/`)
-3. When someone visits, the server sends them `index.html` and JS files
-4. Browser runs the JavaScript - your app works!
-
-**Why it's simple:**
-
-- No server-side code needed
-- No database
-- Just static files
-- Free (for most services)
-
-**Perfect for:**
-
-- ✅ Frontend apps (like TreeType)
-- ✅ SPAs (Single Page Applications)
-- ✅ Static sites
-- ✅ Personal projects
-
-#### Option B: Traditional Hosting (Not Needed for Us)
-
-**Examples:** AWS EC2, DigitalOcean, your own server
-
-**How it works:**
-
-1. You manage a server
-2. Install Node.js on server
-3. Run `pnpm build` on server
-4. Serve files with nginx/Apache
-
-**More complex, but needed for:**
-
-- Apps with backends (APIs, databases)
-- Server-side rendering (SSR)
-- Real-time features (WebSockets)
-
-**TreeType doesn't need this** - we're purely frontend!
-
----
-
-## 🚀 Part 4: GitHub Pages - Free Static Hosting
+- Compiled JavaScript (TypeScript → JS)
+- Minified and bundled
+- Small, optimized files
+- Ready to deploy
 
 ### What is GitHub Pages?
 
-**GitHub Pages** = Free static file hosting for GitHub repositories.
+**GitHub Pages** = Free static file hosting for GitHub repositories
 
-**The deal:**
+**The Setup:**
 
-- You: Upload HTML/CSS/JS files to GitHub
-- GitHub: Serves them on a public URL
-- Free for public repos
-- Automatic HTTPS (secure)
-- Fast CDN (Content Delivery Network)
+- Your source code lives on the `main` branch
+- Built files live on the `gh-pages` branch
+- GitHub serves the `gh-pages` branch at `https://username.github.io/repo-name/`
 
-### How GitHub Pages Works
+**Why two branches?**
 
-#### Concept: Branches as Deployment Sources
-
-Your GitHub repo can have multiple branches:
-
-```
-main branch (your work)
-├── src/               ← Source code
-├── tests/             ← Tests
-├── package.json       ← Dependencies
-├── tsconfig.json      ← Config
-└── dist/ (ignored)    ← Not committed
-
-gh-pages branch (deployment)
-├── index.html         ← Built HTML
-├── library.html
-└── assets/
-    └── main-xxx.js    ← Built JavaScript
-```
-
-**Key insight:** `main` has source code, `gh-pages` has built files. They're separate!
-
-### Why Two Branches?
-
-**Problem:** If you commit `dist/` to `main`:
-
-- Every build creates new commit (pollutes history)
-- Merge conflicts on generated files
-- Hard to review PRs (1000s of lines of minified code)
-
-**Solution:** Keep them separate:
-
-- `main` - source code only (what humans read)
-- `gh-pages` - built files only (what browsers run)
-
-### GitHub Pages Setup
-
-**One-time configuration:**
-
-1. Go to your repo on GitHub
-2. Settings → Pages
-3. Source: Deploy from a branch
-4. Branch: `gh-pages` / `/ (root)`
-5. Save
-
-**What this does:**
-
-- GitHub watches the `gh-pages` branch
-- When it changes, GitHub Pages updates your site
-- Your site becomes available at: `https://username.github.io/treetype/`
+- Keeps source code separate from build artifacts
+- No merge conflicts on generated files
+- Clean git history
 
 ---
 
-## 🔄 Part 5: Manual Deployment - Understanding the Process
+## Part 2: The Critical Configuration
 
-Let's walk through deploying manually to understand each step.
+### ⚠️ THE #1 MISTAKE: Missing Base Path
 
-### The Manual Workflow
+Your app will be served at `https://username.github.io/treetype/`, not at the root `/`.
 
-```
-┌──────────────────────────────────────────────────────┐
-│  Step 1: Make changes on main branch                │
-│  $ vim src/app.ts                                    │
-│  $ git add .                                         │
-│  $ git commit -m "Add new feature"                   │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 2: Build production bundle                     │
-│  $ pnpm build                                        │
-│  • TypeScript compiles to JavaScript                 │
-│  • Code gets minified                                │
-│  • Output goes to dist/                              │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 3: Switch to gh-pages branch                   │
-│  $ git checkout gh-pages                             │
-│  (This branch has no source code, just built files)  │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 4: Copy dist/ contents to root                 │
-│  $ cp -r dist/* .                                    │
-│  • index.html → root                                 │
-│  • assets/ → root/assets/                            │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 5: Commit on gh-pages                          │
-│  $ git add .                                         │
-│  $ git commit -m "Deploy new version"                │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 6: Push gh-pages to GitHub                     │
-│  $ git push origin gh-pages                          │
-│  GitHub Pages detects the change...                  │
-│  Site updates in ~30 seconds!                        │
-└──────────────────────────────────────────────────────┘
-                        ↓
-┌──────────────────────────────────────────────────────┐
-│  Step 7: Return to main branch                       │
-│  $ git checkout main                                 │
-│  Continue working on source code...                  │
-└──────────────────────────────────────────────────────┘
+**Without the base path**, Vite generates:
+
+```html
+<script src="/assets/main.js"></script>
 ```
 
-### What Happens on GitHub's Side
+Which tries to load from: `https://username.github.io/assets/main.js` ❌ (404!)
 
-When you push to `gh-pages`:
+**With the base path**, Vite generates:
 
-```
-You: git push origin gh-pages
-    ↓
-GitHub: "New commit on gh-pages! Deploying..."
-    ↓
-GitHub: Copies files to CDN servers worldwide
-    ↓
-GitHub: Updates DNS (domain name)
-    ↓
-Done! Site is live at https://username.github.io/treetype/
+```html
+<script src="/treetype/assets/main.js"></script>
 ```
 
-**How fast?** Usually 30-60 seconds for first deployment, 10-20 seconds for updates.
+Which loads from: `https://username.github.io/treetype/assets/main.js` ✅
 
-### Verifying Deployment
+### Fix: Update vite.config.ts
 
-**Check deployment status:**
+```typescript
+import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
+export default defineConfig({
+  base: "/treetype/", // ← CRITICAL! Replace 'treetype' with your repo name
+
+  root: ".",
+  build: {
+    outDir: "dist",
+    minify: "terser",
+    sourcemap: true,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        library: resolve(__dirname, "library.html"), // If you have multiple pages
+      },
+    },
+  },
+  // ... rest of your config
+});
 ```
-https://github.com/username/treetype/deployments
-```
 
-You'll see:
-
-- ✅ Active deployment (green)
-- Build time
-- Commit that was deployed
-- When it went live
+**Replace `/treetype/`** with your actual repository name!
 
 ---
 
-## 🤖 Part 6: Automated Deployment - CI/CD
+## Part 3: Package Scripts
 
-### What is CI/CD?
+### Add Deployment Scripts to package.json
 
-**CI = Continuous Integration**
-
-- Automatically test code when you push
-- Catch bugs early
-- Ensure code quality
-
-**CD = Continuous Deployment**
-
-- Automatically deploy after tests pass
-- No manual steps
-- Push code → site updates
-
-**Together:** Your push triggers tests → build → deploy (all automatic!)
-
-### GitHub Actions - CI/CD for GitHub
-
-**GitHub Actions** = GitHub's built-in automation platform.
-
-**How it works:**
-
-1. You create a "workflow" (YAML file)
-2. GitHub runs workflow on their servers (free!)
-3. Workflow does whatever you tell it (test, build, deploy)
-
-### The Automated Workflow
-
-**File:** `.github/workflows/deploy.yml`
-
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main] # Run when you push to main
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:prod": "pnpm run type-check && pnpm run test && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "rebuild": "pnpm run clean && pnpm run build:prod"
+  }
+}
 ```
 
-**When you push to main:**
+**Key scripts:**
 
-```
-You: git push origin main
-    ↓
-GitHub: "Push detected! Running workflow..."
-    ↓
-╔═══════════════════════════════════════════════╗
-║  GitHub Actions Runner (Ubuntu VM in cloud)   ║
-╠═══════════════════════════════════════════════╣
-║  Step 1: Checkout code                        ║
-║  $ git clone your-repo                        ║
-║                                               ║
-║  Step 2: Setup Node.js                        ║
-║  $ install node v20                           ║
-║                                               ║
-║  Step 3: Setup pnpm                           ║
-║  $ npm install -g pnpm                        ║
-║                                               ║
-║  Step 4: Install dependencies                 ║
-║  $ pnpm install                               ║
-║                                               ║
-║  Step 5: Type check                           ║
-║  $ pnpm run type-check                        ║
-║  ✓ No type errors                             ║
-║                                               ║
-║  Step 6: Run tests                            ║
-║  $ pnpm run test                              ║
-║  ✓ 38/38 tests passed                         ║
-║                                               ║
-║  Step 7: Build                                ║
-║  $ pnpm run build                             ║
-║  ✓ Built to dist/                             ║
-║                                               ║
-║  Step 8: Deploy to gh-pages                   ║
-║  $ (push dist/ to gh-pages branch)            ║
-║  ✓ Deployed!                                  ║
-╚═══════════════════════════════════════════════╝
-    ↓
-GitHub Pages: Updates your site
-    ↓
-Done! Site is live
-```
+- `build:prod` - Builds with safety checks (tests + type checking)
+- `preview` - Test your production build locally
+- `clean` - Remove old build artifacts
 
-**Your new workflow:**
+---
+
+## Part 4: The Deployment Script
+
+### Create deploy.sh
+
+This script is battle-tested and handles edge cases that caused issues in early versions.
 
 ```bash
-# 1. Make changes
+#!/bin/bash
+# TreeType Deployment Script - Bulletproof Version
+
+set -e  # Exit on any error
+
+echo "🚀 TreeType Deployment Script"
+echo "=============================="
+
+# Safety check: Must be on main branch
+CURRENT_BRANCH=$(git branch --show-current)
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+    echo "⚠️  Must be on main branch to deploy."
+    exit 1
+fi
+
+# Safety check: No uncommitted changes
+if [[ -n $(git status --porcelain) ]]; then
+    echo "⚠️  Uncommitted changes found. Please commit or stash."
+    git status --short
+    exit 1
+fi
+
+# Run tests
+echo "🧪 Running tests..."
+if ! pnpm run test; then
+    echo "❌ Tests failed! Fix errors before deploying."
+    exit 1
+fi
+echo "   ✅ Tests passed"
+
+# Type check
+echo "📝 Type checking..."
+if ! pnpm run type-check; then
+    echo "❌ Type errors found! Fix errors before deploying."
+    exit 1
+fi
+echo "   ✅ No type errors"
+
+# Build
+echo "📦 Building production bundle..."
+if ! pnpm run build; then
+    echo "❌ Build failed!"
+    exit 1
+fi
+
+# Create temporary directory OUTSIDE the repo
+# This is critical - don't use dist/ directly!
+TMP_DIR=$(mktemp -d)
+echo "   📁 Created temp directory: $TMP_DIR"
+
+# Copy dist contents to temp (while still on main branch)
+cp -r dist/* "$TMP_DIR/"
+echo "   ✅ Build artifacts saved to temporary location"
+
+# Prepare gh-pages branch
+echo "🌿 Preparing gh-pages branch..."
+git fetch origin
+
+# Checkout gh-pages (create if doesn't exist)
+if git rev-parse --verify origin/gh-pages > /dev/null 2>&1; then
+    git checkout gh-pages
+    git pull origin gh-pages
+else
+    git checkout --orphan gh-pages
+fi
+
+# Clean working directory - PRESERVE .git/
+git rm -rf . 2>/dev/null || true
+find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+# Copy ONLY the build files from temp
+cp -r "$TMP_DIR"/* .
+touch .nojekyll  # Tells GitHub Pages not to use Jekyll
+
+echo "📦 Files copied to gh-pages branch"
+
+# Clean up temporary directory
+rm -rf "$TMP_DIR"
+echo "   🧹 Cleaned up temp directory"
+
+# Show what we're deploying
+echo ""
+echo "📋 Files in gh-pages branch:"
+ls -lh
+echo ""
+
+# Commit and push
+git add .
+if git diff --staged --quiet; then
+    echo "ℹ️  No changes to deploy"
+else
+    git commit -m "Deploy: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "⬆️  Pushing to GitHub..."
+    git push origin gh-pages
+    echo "✅ Deployment successful!"
+fi
+
+# Return to main
+git checkout main
+echo "↩️  Switched back to main branch"
+echo ""
+echo "🌍 Your site will be live at: https://USERNAME.github.io/REPO-NAME/"
+echo "   (Usually takes 30-60 seconds for first deployment)"
+```
+
+### Make Script Executable
+
+```bash
+chmod +x deploy.sh
+```
+
+### Update USERNAME and REPO-NAME
+
+Edit the last line to use your actual GitHub username and repository name.
+
+---
+
+## Part 5: GitHub Pages Configuration
+
+### One-Time Setup
+
+1. Go to your repository on GitHub
+2. Click **Settings** → **Pages** (left sidebar)
+3. Under "Source", select:
+   - **Deploy from a branch**
+   - Branch: **gh-pages**
+   - Folder: **/ (root)**
+4. Click **Save**
+
+**That's it!** GitHub will now automatically serve your gh-pages branch.
+
+---
+
+## Part 6: The Deployment Workflow
+
+### Step-by-Step Process
+
+```bash
+# 1. Make changes on main branch
 vim src/app.ts
 
 # 2. Test locally
-pnpm dev
+pnpm dev  # or pnpm test
 
-# 3. Commit and push
+# 3. Commit your changes
 git add .
-git commit -m "feat: New feature"
-git push
+git commit -m "feat: Add new feature"
 
-# 4. That's it! GitHub does the rest:
-# • Runs tests
-# • Builds production bundle
-# • Deploys to GitHub Pages
-# • All in ~2 minutes
+# 4. Deploy
+./deploy.sh
+
+# The script automatically:
+# - ✅ Verifies you're on main branch
+# - ✅ Checks for uncommitted changes
+# - ✅ Runs tests
+# - ✅ Type checks
+# - ✅ Builds production bundle
+# - ✅ Switches to gh-pages branch
+# - ✅ Copies build files
+# - ✅ Commits and pushes
+# - ✅ Returns to main branch
 ```
 
-### Watching the Workflow
+### What Happens on GitHub
 
-Visit: `https://github.com/username/treetype/actions`
+```
+You push to gh-pages
+    ↓
+GitHub detects change
+    ↓
+GitHub Pages rebuilds (30-60 seconds)
+    ↓
+Site is live!
+```
+
+---
+
+## Part 7: Testing Before Deployment
+
+### Always Test the Production Build Locally
+
+```bash
+# Build
+pnpm run build
+
+# Preview (serves the dist/ folder)
+pnpm run preview
+```
+
+**Visit**: `http://localhost:4173/treetype/`
+
+**Notice**: The URL now includes `/treetype/` - this simulates GitHub Pages!
+
+**Verify**:
+
+- ✅ App loads correctly
+- ✅ All features work
+- ✅ No console errors
+- ✅ Assets load properly
+
+**If it works locally**, it will work on GitHub Pages.
+
+---
+
+## Part 8: Common Issues & Solutions
+
+### Issue #1: Empty Page / Blank Screen
+
+**Symptom**: Site loads but shows nothing, no console errors
+
+**Cause**: Missing or incorrect `base` path in vite.config.ts
+
+**Solution**:
+
+```typescript
+export default defineConfig({
+  base: "/your-repo-name/", // ← Must match your GitHub repo name!
+  // ...
+});
+```
+
+**Verify**: Check browser DevTools → Network tab. Look for 404 errors on asset files.
+
+### Issue #2: 404 on All Assets
+
+**Symptom**: Console shows multiple 404 errors for JS/CSS files
+
+**Cause**: Same as Issue #1 - incorrect base path
+
+**How to check**:
+
+1. Open DevTools → Network tab
+2. Look at failed requests
+3. If they're trying to load from `https://username.github.io/assets/...` (missing repo name), base path is wrong
+4. Should be: `https://username.github.io/repo-name/assets/...`
+
+### Issue #3: Deployment Script Fails with "Uncommitted changes"
+
+**Symptom**: Script exits with uncommitted changes warning
+
+**Cause**: You have changes that aren't committed
+
+**Solution**:
+
+```bash
+git status  # See what changed
+git add .
+git commit -m "Your commit message"
+./deploy.sh
+```
+
+### Issue #4: Old Version Still Showing After Deploy
+
+**Symptom**: Deployed but site shows old version
+
+**Cause**: Browser cache
+
+**Solution**: Hard refresh
+
+- **Windows/Linux**: `Ctrl + Shift + R`
+- **Mac**: `Cmd + Shift + R`
+
+### Issue #5: DEV/ or Other Folders Deployed to gh-pages
+
+**Symptom**: Development files visible on gh-pages branch
+
+**Cause**: Script copied entire repo instead of just dist/
+
+**Solution**: The script above is fixed! It uses a temporary directory to only copy dist/ contents. If using an older script version, update to the version shown above.
+
+---
+
+## Part 9: Verifying Deployment
+
+### Check Deployment Status
+
+Visit: `https://github.com/username/repo-name/deployments`
 
 You'll see:
 
-```
-✓ Deploy to GitHub Pages
-  Triggered by: push
-  Commit: feat: New feature
-  Duration: 1m 34s
+- ✅ Active deployment (green checkmark)
+- Commit that was deployed
+- When it went live
+- Direct link to live site
 
-  Jobs:
-  ✓ build-and-deploy (1m 34s)
-    ✓ Checkout repository (2s)
-    ✓ Setup Node.js (5s)
-    ✓ Setup pnpm (3s)
-    ✓ Install dependencies (24s)
-    ✓ Type check (8s)
-    ✓ Run tests (18s)
-    ✓ Build (15s)
-    ✓ Deploy to GitHub Pages (19s)
-```
+### Manual Verification Checklist
 
-**If tests fail:** Deployment is cancelled! Your live site stays on the last working version.
+Visit your live site: `https://username.github.io/repo-name/`
+
+- [ ] Page loads (not blank)
+- [ ] Main functionality works
+- [ ] No console errors (F12 → Console)
+- [ ] All pages load (if multi-page app)
+- [ ] Assets load (check Network tab)
+- [ ] Styles applied correctly
+- [ ] JavaScript executes
 
 ---
 
-## 🎯 Part 7: Comparing the Approaches
+## Part 10: Understanding What Gets Deployed
 
-### Development (`pnpm dev`)
+### main branch (Source Code)
 
-**What:**
+```
+src/                    # TypeScript source
+tests/                  # Test files
+public/                 # Static assets
+package.json            # Dependencies
+tsconfig.json           # TypeScript config
+vite.config.ts          # Build config
+dist/                   # ← In .gitignore (not committed)
+```
 
-- Runs on your machine
-- Real-time TypeScript transformation
-- Hot module replacement
+### gh-pages branch (Built Files)
 
-**When:**
+```
+index.html              # Built HTML
+library.html            # Additional pages (if any)
+assets/
+  main-[hash].js        # Your compiled, minified app
+  config-[hash].js      # Code chunks
+  timer-[hash].js
+  *.css                 # Compiled styles
+snippets/               # Static data (from public/)
+  metadata.json
+  python/*.json
+  javascript/*.json
+.nojekyll               # Tells GitHub: don't use Jekyll
+```
 
-- Writing code
-- Testing features
-- Debugging
-
-**Pros:**
-
-- ⚡ Instant updates
-- 🔍 Detailed error messages
-- 🎯 Source maps (see real line numbers)
-
-**Cons:**
-
-- ❌ Not shareable
-- ❌ Not optimized
-
-### Manual Deployment
-
-**What:**
-
-- You run build script
-- Manually push to gh-pages
-- Deploy when ready
-
-**When:**
-
-- Learning deployment
-- Want control over deploy timing
-- Making experimental changes
-
-**Pros:**
-
-- 🎓 Educational (understand process)
-- 🎛️ Full control
-- ✅ Can test before deploying
-
-**Cons:**
-
-- 🐌 Manual steps each time
-- 💭 Can forget to deploy
-- ⏰ Takes your time
-
-### Automated Deployment (CI/CD)
-
-**What:**
-
-- GitHub runs build automatically
-- Deploys on every push
-- Zero manual steps
-
-**When:**
-
-- Production workflows
-- Team collaboration
-- Want "push to deploy"
-
-**Pros:**
-
-- 🤖 Fully automatic
-- 🛡️ Always runs tests
-- 👥 Consistent for everyone
-- ⏱️ Saves time
-
-**Cons:**
-
-- 🔄 Every push triggers build
-- 📊 Uses GitHub Actions minutes (generous free tier)
-- 🎓 Slightly more complex setup
+**Key point**: gh-pages has NO source code, only the built files needed to run the app.
 
 ---
 
-## 🧪 Part 8: The Safety Net - Why Tests Matter in Deployment
+## Part 11: The .gitignore Configuration
 
-### The Problem Without Tests
+### Ensure dist/ is Ignored on main
 
-**Manual workflow without tests:**
+Your `.gitignore` should include:
 
-```
-You: Make changes
-You: git push
-GitHub Pages: Deploys changes
-Result: Bug goes live! 😱
-```
+```gitignore
+# Build output
+dist/
+dist-ssr/
+*.local
 
-**You find out when users report it** (or worse, when you notice later).
+# Dependencies
+node_modules/
 
-### The Solution: Automated Testing
-
-**With tests in CI/CD:**
-
-```
-You: Make changes
-You: git push
-GitHub Actions: Run tests
-  → Tests fail! ❌
-  → Deployment cancelled
-  → Your live site is safe
-Result: Bug never goes live! ✅
+# Environment files
+.env
+.env.local
+.env.production
 ```
 
-**You find out immediately** (within 30 seconds of push).
-
-### What Tests Catch
-
-**Type errors:**
-
-```typescript
-// You accidentally changed:
-function calculateWPM(chars: number, seconds: string) {
-  // ← string!
-  return chars / 5 / (seconds / 60); // ← Error! Can't divide string
-}
-
-// TypeScript catches this:
-// ✗ Error: Operator '/' cannot be applied to string
-```
-
-**Logic errors:**
-
-```typescript
-// Test catches this:
-test("calculateWPM handles zero seconds", () => {
-  expect(calculateWPM(100, 0)).toBe(0);
-});
-
-// If you had:
-function calculateWPM(chars, seconds) {
-  return chars / 5 / (seconds / 60); // Division by zero!
-}
-
-// Test fails: Expected 0, got Infinity
-```
-
-**Integration errors:**
-
-```typescript
-// Test catches this:
-test("mode switching updates typing sequence", () => {
-  const minimal = applyConfig(line, "minimal");
-  expect(minimal.typing_sequence).toBe("defhello");
-});
-
-// If you broke the filtering logic:
-// Test fails: Expected 'defhello', got 'def hello()'
-```
-
-### The Build Pipeline
-
-**Full pipeline with safety checks:**
-
-```
-┌─────────────────────────────────────────────┐
-│  1. Type Check (TypeScript)                 │
-│  Ensures: No type errors                    │
-│  Time: ~8 seconds                           │
-│  If fails: Stop here ❌                     │
-└─────────────────────────────────────────────┘
-                ↓ Pass ✓
-┌─────────────────────────────────────────────┐
-│  2. Run Tests (Vitest)                      │
-│  Ensures: All 38 tests pass                 │
-│  Time: ~18 seconds                          │
-│  If fails: Stop here ❌                     │
-└─────────────────────────────────────────────┘
-                ↓ Pass ✓
-┌─────────────────────────────────────────────┐
-│  3. Build (Vite)                            │
-│  Ensures: Code compiles                     │
-│  Time: ~15 seconds                          │
-│  If fails: Stop here ❌                     │
-└─────────────────────────────────────────────┘
-                ↓ Pass ✓
-┌─────────────────────────────────────────────┐
-│  4. Deploy (GitHub Pages)                   │
-│  Your working code goes live! ✓             │
-│  Time: ~20 seconds                          │
-└─────────────────────────────────────────────┘
-```
-
-**Total time:** ~1-2 minutes from push to live.
-
-**Confidence:** If deployment succeeds, you know it works!
+**Why?** We don't want build artifacts in our source code repository. They belong only on gh-pages.
 
 ---
 
-## 📊 Part 9: Real-World Example - Your TreeType Project
+## Part 12: Quick Reference
 
-Let's trace through what happens with your actual project.
-
-### Scenario: You Add a New Feature
-
-**Step 1: Development**
+### Essential Commands
 
 ```bash
-# You add a new typing mode
-vim src/core/config.ts
+# Development
+pnpm dev                    # Start dev server
+pnpm test                   # Run tests
+pnpm run type-check         # Check types
 
-# Add "expert" mode
-export const PRESETS: PresetsConfig = {
-  minimal: { /* ... */ },
-  standard: { /* ... */ },
-  full: { /* ... */ },
-  expert: {  // NEW!
-    name: "Expert",
-    description: "Type everything including strings",
-    exclude: ["comment"],
-  },
-};
+# Building
+pnpm run build              # Build production
+pnpm run preview            # Preview production build locally
 
-# Test locally
-pnpm dev
-# Visit localhost:3000, test expert mode
-# Works great!
+# Deploying
+./deploy.sh                 # Deploy to GitHub Pages
+
+# Troubleshooting
+pnpm run clean              # Remove old build
+pnpm run rebuild            # Clean + build
+git checkout gh-pages       # Inspect deployed files
+git checkout main           # Return to source
 ```
 
-**Step 2: Manual Deployment Approach**
+### File Locations Reference
+
+```
+vite.config.ts              # ← Add base: '/repo-name/' here!
+package.json                # ← Build scripts
+deploy.sh                   # ← Deployment automation
+.gitignore                  # ← Ensure dist/ is listed
+```
+
+---
+
+## Part 13: What We Learned (Lessons from Real Deployment)
+
+### The Original Script Issues (Fixed in Current Version)
+
+**Problem 1**: Script copied entire repo to gh-pages
+
+- **Impact**: Source code, DEV folders deployed publicly
+- **Fix**: Use temporary directory, copy only dist/ contents
+
+**Problem 2**: No temporary directory cleanup
+
+- **Impact**: Failed deployments left garbage in git
+- **Fix**: Proper temp directory handling with cleanup
+
+**Problem 3**: Base path not in tutorial
+
+- **Impact**: Most critical issue - app wouldn't load
+- **Fix**: Explicit base path configuration as primary step
+
+### Best Practices Discovered
+
+1. **Always test production build locally first**
+
+   - Catches 90% of deployment issues
+   - Use `pnpm run preview` before deploying
+
+2. **Hard refresh after deployment**
+
+   - Browser cache causes confusion
+   - Ctrl+Shift+R is your friend
+
+3. **Check Network tab for 404s**
+
+   - DevTools Network tab reveals path issues immediately
+   - Look for asset loading failures
+
+4. **Verify gh-pages branch contents**
+
+   - `git checkout gh-pages` and inspect
+   - Should contain ONLY dist/ contents
+
+5. **Use safety checks in deployment script**
+   - Branch verification
+   - Uncommitted changes check
+   - Test + type check before deploy
+
+---
+
+## Part 14: Next Steps
+
+### After First Successful Deployment
+
+1. **Update your README.md**:
+
+   ```markdown
+   ## 🚀 Live Demo
+
+   Visit: https://username.github.io/repo-name/
+   ```
+
+2. **Optional: Custom domain**
+
+   - You can use a custom domain with GitHub Pages
+   - Add CNAME file to gh-pages branch
+   - Configure DNS settings
+
+3. **Optional: GitHub Actions**
+
+   - Automate deployment on every push
+   - See CI/CD tutorials for this
+   - But master manual deployment first!
+
+4. **Share your project**
+   - Your app is now public!
+   - Add the link to your portfolio
+   - Share with others
+
+---
+
+## Appendix: Debugging Checklist
+
+When deployment fails, check in this order:
+
+### 1. Build Process
 
 ```bash
-# Run the deploy script
-./deploy.sh
-
-# Script runs:
-🧪 Running tests...
-   ✓ All tests passed (38/38)
-
-📝 Type checking...
-   ✓ No type errors
-
-🔨 Building production bundle...
-   ✓ Built in 121ms
-
-🌐 Would you like to preview? (y/n)
-y
-
-# You test at localhost:4173
-# Everything works!
-
-Ready to deploy? (y/n)
-y
-
-📦 Preparing gh-pages branch...
-⬆️  Pushing to GitHub...
-✅ Deployment complete!
-
-# 30 seconds later, live at:
-# https://username.github.io/treetype/
+pnpm run build
+# Does it complete without errors?
+# Check dist/ folder was created
 ```
 
-**Step 3: Automated Deployment Approach**
+### 2. Base Path
 
 ```bash
-# Just push to GitHub
-git add src/core/config.ts
-git commit -m "feat: Add expert typing mode"
-git push origin main
-
-# GitHub Actions starts automatically
-# Visit: https://github.com/username/treetype/actions
-
-# You see:
-✓ Type check (8s)
-✓ Run tests (18s)
-✓ Build (15s)
-✓ Deploy (20s)
-
-# Total: 1m 1s
-# Site is live!
+# Check vite.config.ts has base: '/repo-name/'
+cat vite.config.ts | grep base
 ```
 
-### Scenario: You Introduce a Bug
+### 3. GitHub Pages Settings
 
-**What happens with manual deployment:**
+- Repo → Settings → Pages
+- Source: gh-pages branch, / (root)
+
+### 4. Browser Cache
+
+- Hard refresh (Ctrl+Shift+R)
+- Or open in incognito mode
+
+### 5. GitHub Pages Build
+
+- Check deployments page
+- Wait 60 seconds after push
+- Look for error messages
+
+### 6. Console Errors
+
+- Open DevTools (F12)
+- Console tab - any errors?
+- Network tab - any 404s?
+
+### 7. Deployed Files
 
 ```bash
-# You accidentally break something
-vim src/core/timer.ts
-# Typo: seconds.toString() instead of seconds
-
-./deploy.sh
-
-🧪 Running tests...
-   ✗ Tests failed!
-
-Test: calculateWPM handles zero seconds
-Expected: 0
-Received: NaN
-
-# Script stops! ❌
-# Your live site is safe
-# You fix the bug, try again
-```
-
-**What happens with automated deployment:**
-
-```bash
-# You push the buggy code
-git push origin main
-
-# GitHub Actions runs...
-# After ~26 seconds:
-
-❌ Run tests
-   ✗ calculateWPM handles zero seconds
-   Expected: 0, got: NaN
-
-Deployment cancelled ❌
-
-# Email notification: "Workflow run failed"
-# You fix the bug, push again
-# This time tests pass → deploys
+git checkout gh-pages
+ls -la  # Verify files are there
+cat index.html | head -20  # Check script paths
+git checkout main
 ```
 
 ---
 
-## 🎓 Part 10: Key Takeaways
+## Summary
 
-### Mental Model Summary
+**The Three Critical Points:**
 
-**Three environments:**
+1. **Base Path Configuration** - `base: '/repo-name/'` in vite.config.ts
+2. **Proper Deployment Script** - Uses temp directory, copies only dist/
+3. **Test Locally First** - `pnpm run preview` catches issues before deployment
 
-1. **Development** (`pnpm dev`)
-
-   - Your machine
-   - TypeScript files
-   - Instant updates
-   - Detailed errors
-   - Purpose: Write code
-
-2. **Production Preview** (`pnpm preview`)
-
-   - Your machine
-   - Built JavaScript
-   - Simulates real deployment
-   - Purpose: Test before deploying
-
-3. **Production** (GitHub Pages)
-   - GitHub's servers
-   - Built JavaScript
-   - Accessible to world
-   - Purpose: Serve users
-
-### The Deployment Journey
-
-```
-Source Code (what you write)
-    ↓ pnpm build
-Built Code (what browsers run)
-    ↓ deployment
-Live Site (what users see)
-```
-
-### Why Each Step Matters
-
-**TypeScript → JavaScript**
-
-- Browsers can't run TypeScript
-- Type checking catches bugs
-- JavaScript is universal
-
-**Bundling & Minification**
-
-- Smaller files = faster loading
-- Fewer HTTP requests
-- Better performance
-
-**Testing Before Deploy**
-
-- Catches bugs before users see them
-- Ensures quality
-- Maintains confidence
-
-**Automated Deployment**
-
-- Saves time
-- Ensures consistency
-- Reduces human error
+Follow these, and manual deployment to GitHub Pages is straightforward!
 
 ---
 
-## 🚀 Part 11: Your Next Steps
+**Your deployment is working when:**
 
-### Path 1: Manual Deployment (Recommended for Learning)
+- ✅ Site loads at https://username.github.io/repo-name/
+- ✅ All features function correctly
+- ✅ No console errors
+- ✅ Assets load (check Network tab)
+- ✅ Navigation works (if multi-page)
 
-1. **Understand build:**
-
-   ```bash
-   pnpm build
-   # Watch output, see what happens
-   # Check dist/ folder
-   ```
-
-2. **Test locally:**
-
-   ```bash
-   pnpm preview
-   # Compare to pnpm dev
-   # Notice differences
-   ```
-
-3. **Deploy manually:**
-
-   ```bash
-   ./deploy.sh
-   # Follow each step
-   # Understand what it does
-   ```
-
-4. **Repeat 2-3 times:**
-   - Make small changes
-   - Deploy each time
-   - Build muscle memory
-
-### Path 2: Jump to Automation
-
-1. **Setup GitHub Actions:**
-
-   ```bash
-   mkdir -p .github/workflows
-   # Add workflow file
-   ```
-
-2. **Push and watch:**
-
-   ```bash
-   git push
-   # Visit Actions tab
-   # Watch workflow run
-   ```
-
-3. **Experience the magic:**
-   - Make change
-   - Push
-   - Wait 2 minutes
-   - Site updates!
-
-### Recommended: Do Both!
-
-**Week 1:** Manual deployment (3-4 times)
-
-- Internalize the process
-- Understand each step
-- Build confidence
-
-**Week 2+:** Switch to automation
-
-- Enjoy push-to-deploy
-- Keep manual script as backup
-- Best of both worlds!
-
----
-
-## 📚 Glossary
-
-**Build** - Converting source code to production-ready files
-
-**Bundle** - Combining many files into fewer optimized files
-
-**CI/CD** - Continuous Integration/Continuous Deployment (automated testing and deployment)
-
-**Deploy** - Making your app accessible on the internet
-
-**Development Server** - Local server for testing (pnpm dev)
-
-**Distribution Folder (dist/)** - Output folder containing built files
-
-**GitHub Actions** - GitHub's automation platform
-
-**GitHub Pages** - Free static site hosting by GitHub
-
-**Minification** - Removing whitespace and shortening names to reduce file size
-
-**Production** - The live, public version of your app
-
-**Source Maps** - Files that map minified code back to original source
-
-**Static Hosting** - Serving pre-built HTML/CSS/JS files (no server-side processing)
-
-**Tree Shaking** - Removing unused code from bundles
-
-**Workflow** - Automated sequence of steps (in GitHub Actions)
-
----
-
-## 🎯 Final Thoughts
-
-**Development vs. Production** is one of the most important concepts in web development. Understanding this unlocks:
-
-- ✅ Ability to share your work
-- ✅ Professional deployment practices
-- ✅ Confidence in your code
-- ✅ Automated workflows
-- ✅ Better debugging skills
-
-**Start simple** (manual deployment), then **automate** when you're comfortable. Both are valuable skills!
-
-Now you're ready to deploy TreeType to the world! 🚀
-
----
-
-_Questions? Review specific sections as needed. Each part builds on the previous, so feel free to re-read until concepts click!_
+**Happy deploying!** 🚀
