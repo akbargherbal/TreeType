@@ -1,5 +1,5 @@
 #!/bin/bash
-# TreeType Deployment Script - Fixed (v5)
+# TreeType Deployment Script - Fixed (v6)
 
 set -e
 
@@ -8,12 +8,12 @@ echo "=============================="
 
 # Safety checks
 CURRENT_BRANCH=$(git branch --show-current)
-if [[ "$CURRENT_BRANCH" != "main" ]]; then 
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
     echo "⚠️  Must be on main branch to deploy."
     exit 1
 fi
 
-if [[ -n $(git status --porcelain) ]]; then 
+if [[ -n $(git status --porcelain) ]]; then
     echo "⚠️  Uncommitted changes found. Please commit or stash."
     git status --short
     exit 1
@@ -65,9 +65,12 @@ else
     git checkout --orphan gh-pages
 fi
 
-# Clean working directory (remove everything)
+# Clean working directory - BUT PRESERVE .git/
+# Remove all tracked files
 git rm -rf . 2>/dev/null || true
-rm -rf * .* 2>/dev/null || true  # Also remove hidden files
+
+# Remove untracked files/dirs EXCEPT .git
+find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
 # Copy ONLY the build files from temp
 cp -r "$TMP_DIR"/* .
