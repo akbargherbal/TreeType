@@ -14,7 +14,12 @@ import {
   calculateAccuracy,
   formatTime,
 } from "./core/timer";
-import { loadSnippetStats, saveSnippetStats } from "./core/storage";
+import {
+  loadSnippetStats,
+  saveSnippetStats,
+  enableFirebaseSync,
+  disableFirebaseSync,
+} from "./core/storage";
 import { AuthManager } from "./core/auth";
 import { User } from "firebase/auth";
 
@@ -66,8 +71,17 @@ export class TreeTypeApp {
    * Handle authentication state changes
    */
   private handleAuthChange(user: User | null): void {
+    // Handle Sync State
+    if (user) {
+      enableFirebaseSync(user.uid).catch((err) =>
+        console.error("Sync failed:", err)
+      );
+    } else {
+      disableFirebaseSync();
+    }
+
+    // Handle UI
     const authContainer = document.getElementById("authContainer");
-    
     if (!authContainer) return;
 
     if (user) {
@@ -81,7 +95,7 @@ export class TreeTypeApp {
           Sign Out
         </button>
       `;
-      
+
       // Wire up Sign Out
       document.getElementById("authBtn")?.addEventListener("click", () => {
         this.authManager.logout();
@@ -93,7 +107,7 @@ export class TreeTypeApp {
           <span>G</span> Sign In
         </button>
       `;
-      
+
       // Wire up Sign In
       document.getElementById("authBtn")?.addEventListener("click", () => {
         this.authManager.signInWithGoogle().catch((error) => {
@@ -520,7 +534,9 @@ export class TreeTypeApp {
 
     // Save stats
     if (this.snippetInfo.id) {
-      saveSnippetStats(this.snippetInfo.id, wpm, accuracy);
+      saveSnippetStats(this.snippetInfo.id, wpm, accuracy).catch((err) =>
+        console.error("Failed to save stats:", err)
+      );
     }
 
     this.updatePauseButton();
