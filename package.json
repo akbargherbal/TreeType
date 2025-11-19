@@ -1,6 +1,6 @@
 {
   "name": "treetype",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Code typing practice with real programming patterns",
   "type": "module",
   "scripts": {
@@ -14,6 +14,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "clean": "rm -rf dist",
+    "deploy": "pnpm run build:prod && firebase deploy",
     "rebuild": "pnpm run clean && pnpm run build:prod"
   },
   "keywords": [
